@@ -194,25 +194,23 @@ void Graph::make_example()
 
 void Graph::initTabAdja()
 {
-    int m_ordre = 7;
-    int m_nb_arete = 11;
     ///on initialise le tableau d'adjacense
     for(int w=0; w<m_ordre; w++)
     {
         m_adjacensePoids.push_back( std::vector<int> () );
         for(int z=0; z<m_ordre; z++)
         {
-                m_adjacensePoids[w].push_back(0);
+            m_adjacensePoids[w].push_back(0);
         }
     }
-/*
+
     ///on donne les valeurs du fichier au tableau d'adjacense
     for(int i=0; i<m_nb_arete; i++)
     {
         m_adjacensePoids[m_edges[i].m_from][m_edges[i].m_to]=m_edges[i].m_weight;
         m_adjacensePoids[m_edges[i].m_to][m_edges[i].m_from]=m_edges[i].m_weight;
     }
-*/
+
     ///on affiche le tableau d'adjacense
     std::cout<<"Tableau d'adjacense : "<<std::endl;
     for(int w=0; w<m_ordre; w++)
@@ -226,12 +224,70 @@ void Graph::initTabAdja()
     std::cout<<std::endl<<std::endl<<std::endl;
 
 
-    for(std::map<int, Edge>::iterator it = m_edges.begin();it != m_edges.end(); ++it)
-{
-    std::cout << "clef " << it->first << " Présentation : " << it->second.m_weight<< std::endl;
+    for(std::map<int, Edge>::iterator it = m_edges.begin(); it != m_edges.end(); ++it)
+    {
+        std::cout << "clef " << it->first << " Présentation : " << it->second.m_weight<< std::endl;
+    }
+
+
 }
 
+void Graph::load_graph(std::string nom_fichier)
+{
+    nom_fichier = nom_fichier + ".txt";
+    std::ifstream fc(nom_fichier.c_str(), std::ios::in);
 
+    if(!fc.fail())
+    {
+        fc >> m_ordre;
+        fc >> m_nb_arete;
+
+        for(int i(0); i<m_nb_arete; ++i)
+        {
+            fc >> m_edges[i].m_from;
+            fc >> m_edges[i].m_to;
+            fc >> m_edges[i].m_weight;
+        }
+
+        for(int i(0); i<m_ordre; ++i)
+        {
+            getline(fc, m_vertices[i].m_namePicture,'#');
+        }
+    }
+
+    else
+    {
+        std::cout << "Error lors du chargement du fichier !" << std::endl;
+    }
+}
+
+void Graph::save_graph(std::string nom_fichier)
+{
+    nom_fichier = nom_fichier + ".txt";
+    std::ofstream fc(nom_fichier.c_str(), std::ios::out);
+
+    if(!fc.fail())
+    {
+        fc << m_ordre << " ";
+        fc << m_nb_arete << " ";
+
+        for(int i(0); i<m_nb_arete; ++i)
+        {
+            fc << m_edges[i].m_from << " ";
+            fc << m_edges[i].m_to << " ";
+            fc << m_edges[i].m_weight << " ";
+        }
+
+        for(int i(0); i<m_ordre; ++i)
+        {
+            fc << m_vertices[i].m_namePicture << "#";
+        }
+    }
+
+    else
+    {
+        std::cout << "Error lors du chargement du fichier !" << std::endl;
+    }
 }
 
 /// La méthode update à appeler dans la boucle de jeu pour les graphes avec interface

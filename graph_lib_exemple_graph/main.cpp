@@ -14,6 +14,8 @@ int main()
     /// Un exemple de graphe
     Graph g;
     g.make_example();
+    g.load_graph("countryside");
+    g.save_graph("countryside");
     g.initTabAdja();
 
 

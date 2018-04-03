@@ -75,6 +75,7 @@
 #include <map>
 #include <string>
 #include <memory>
+#include <fstream>
 
 #include "grman/grman.h"
 
@@ -140,6 +141,9 @@ class Vertex
 
         /// un exemple de donnée associée à l'arc, on peut en ajouter d'autres...
         double m_value;
+
+        /// Nom de l'image associée
+        std::string m_namePicture;
 
         /// le POINTEUR sur l'interface associée, nullptr -> pas d'interface
         std::shared_ptr<VertexInterface> m_interface = nullptr;
@@ -319,12 +323,17 @@ class Graph
         /// de chargement de fichiers par exemple.
         void make_example();
 
-
         /// La méthode update à appeler dans la boucle de jeu pour les graphes avec interface
         void update();
 
         ///affichage des maps
         void initTabAdja();
+
+        /// Lecture des fichiers du projet
+        void load_graph(std::string nom_fichier);
+
+        /// Enregistre les valeurs des Aretes dans le fichier
+        void save_graph(std::string nom_fichier);
 };
 
 
