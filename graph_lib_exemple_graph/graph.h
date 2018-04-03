@@ -250,6 +250,8 @@ class GraphInterface
 
     private :
 
+
+
         /// Les widgets de l'interface. N'oubliez pas qu'il ne suffit pas de déclarer
         /// ici un widget pour qu'il apparaisse, il faut aussi le mettre en place et
         /// le paramétrer ( voir l'implémentation du constructeur dans le .cpp )
@@ -291,6 +293,9 @@ class Graph
         /// le POINTEUR sur l'interface associée, nullptr -> pas d'interface
         std::shared_ptr<GraphInterface> m_interface = nullptr;
 
+        ///tableau d'adjacense
+        std::vector<std::vector<int>> m_adjacensePoids;
+
 
     public:
 
@@ -311,6 +316,9 @@ class Graph
 
         /// La méthode update à appeler dans la boucle de jeu pour les graphes avec interface
         void update();
+
+        ///affichage des maps
+        void initTabAdja();
 };
 
 

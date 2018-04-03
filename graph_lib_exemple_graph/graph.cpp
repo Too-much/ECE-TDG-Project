@@ -14,7 +14,7 @@ VertexInterface::VertexInterface(int idx, int x, int y, std::string pic_name, in
 
     // Le slider de réglage de valeur
     m_top_box.add_child( m_slider_value );
-    m_slider_value.set_range(0.0 , 100.0); // Valeurs arbitraires, à adapter...
+    m_slider_value.set_range(0.0, 100.0);  // Valeurs arbitraires, à adapter...
     m_slider_value.set_dim(20,80);
     m_slider_value.set_gravity_xy(grman::GravityX::Left, grman::GravityY::Up);
 
@@ -92,7 +92,7 @@ EdgeInterface::EdgeInterface(Vertex& from, Vertex& to)
 
     // Le slider de réglage de valeur
     m_box_edge.add_child( m_slider_weight );
-    m_slider_weight.set_range(0.0 , 100.0); // Valeurs arbitraires, à adapter...
+    m_slider_weight.set_range(0.0, 100.0);  // Valeurs arbitraires, à adapter...
     m_slider_weight.set_dim(16,40);
     m_slider_weight.set_gravity_y(grman::GravityY::Up);
 
@@ -149,7 +149,7 @@ GraphInterface::GraphInterface(int x, int y, int w, int h)
     m_main_box.set_gravity_xy(grman::GravityX::Right, grman::GravityY::Up);
     m_img.set_pic_name("coupe_paysage.jpg");
     m_main_box.add_child(m_img);
-   // m_main_box.set_bg_color(BLANCJAUNE);
+    // m_main_box.set_bg_color(BLANCJAUNE);
 }
 
 
@@ -186,7 +186,52 @@ void Graph::make_example()
     add_interfaced_edge(6, 5, 3, 0.0);
     add_interfaced_edge(7, 4, 7, 100.0);
     add_interfaced_edge(8, 6, 3, 20.0);
-    //add_interfaced_edge(9, 3, 7, 80.0);
+    add_interfaced_edge(9, 0, 3, 80.0);
+    add_interfaced_edge(10, 3, 5, 80.0);
+
+
+}
+
+void Graph::initTabAdja()
+{
+    int m_ordre = 7;
+    int m_nb_arete = 11;
+    ///on initialise le tableau d'adjacense
+    for(int w=0; w<m_ordre; w++)
+    {
+        m_adjacensePoids.push_back( std::vector<int> () );
+        for(int z=0; z<m_ordre; z++)
+        {
+                m_adjacensePoids[w].push_back(0);
+        }
+    }
+/*
+    ///on donne les valeurs du fichier au tableau d'adjacense
+    for(int i=0; i<m_nb_arete; i++)
+    {
+        m_adjacensePoids[m_edges[i].m_from][m_edges[i].m_to]=m_edges[i].m_weight;
+        m_adjacensePoids[m_edges[i].m_to][m_edges[i].m_from]=m_edges[i].m_weight;
+    }
+*/
+    ///on affiche le tableau d'adjacense
+    std::cout<<"Tableau d'adjacense : "<<std::endl;
+    for(int w=0; w<m_ordre; w++)
+    {
+        std::cout<<std::endl;
+        for(int z=0; z<m_ordre; z++)
+        {
+            std::cout<<m_adjacensePoids[w][z] <<" ";
+        }
+    }
+    std::cout<<std::endl<<std::endl<<std::endl;
+
+
+    for(std::map<int, Edge>::iterator it = m_edges.begin();it != m_edges.end(); ++it)
+{
+    std::cout << "clef " << it->first << " Présentation : " << it->second.m_weight<< std::endl;
+}
+
+
 }
 
 /// La méthode update à appeler dans la boucle de jeu pour les graphes avec interface
