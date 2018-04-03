@@ -296,6 +296,12 @@ class Graph
         ///tableau d'adjacense
         std::vector<std::vector<int>> m_adjacensePoids;
 
+        ///ordre du graphe
+        int m_ordre;
+
+        ///nombre d'arrete du graphe
+        int m_nb_arete;
+
 
     public:
 
