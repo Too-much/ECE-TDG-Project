@@ -142,6 +142,23 @@ class Vertex
         /// un exemple de donnée associée à l'arc, on peut en ajouter d'autres...
         double m_value;
 
+        bool m_marque;
+
+        ///ce que l'espece consomme (qté de ressource environnementale ou d'animaux prédatés)
+        float m_consumption;
+
+        ///le ryhtme de croissance de l'espece
+        float m_growth;
+
+        ///place que prend une espece dans un environnement (pour une capacite de portage de son environnement = à 100)
+        int m_usedSpace;
+
+        ///ce que l'espece "produit" : waste (+ ressources env pour les plantes)
+        float m_waste;
+
+        /// Nom du sommet
+        std::string m_name;
+
         /// Nom de l'image associée
         std::string m_namePicture;
 
@@ -166,6 +183,25 @@ class Vertex
         Vertex (double value=0, VertexInterface *interface=nullptr) :
             m_value(value), m_interface(interface)  {  }
 
+  /**      ///getters et setters
+        double get_value(){return m_value;}
+        void set_value(double _value){m_value=_value;}
+
+        bool get_marque(){return m_marque;}
+        void set_marque(bool _marque){m_marque=_marque;}
+
+        std::string get_name(){return m_name;}
+        void set_name(std::string _name){m_name=_name;}
+
+        std::string get_namePicture(){return m_namePicture;}
+        void set_namePicture(std::string _namePicture){m_namePicture=_namePicture;}
+
+        float get_growth(){return m_growth;}
+        void set_growth(float _growth){m_growth=_growth;}
+
+        int get_usedSpace(){return m_usedSpace;}
+        void set_usedSpace(int _usedSpace){m_usedSpace=_usedSpace;}
+ */
         /// Vertex étant géré par Graph ce sera la méthode update de graph qui appellera
         /// le pre_update et post_update de Vertex (pas directement la boucle de jeu)
         /// Voir l'implémentation Graph::update dans le .cpp
@@ -244,6 +280,16 @@ class Edge
         Edge (double weight=0, EdgeInterface *interface=nullptr) :
             m_weight(weight), m_interface(interface)  {  }
 
+        ///getters et setters
+        int get_from(){return m_from;}
+        void set_from(int _from){m_from=_from;}
+
+        int get_to(){return m_to;}
+        void set_to(int _to){m_to=_to;}
+
+        double get_weight(){return m_weight;}
+        void set_weight(double _weight){m_weight=_weight;}
+
         /// Edge étant géré par Graph ce sera la méthode update de graph qui appellera
         /// le pre_update et post_update de Edge (pas directement la boucle de jeu)
         /// Voir l'implémentation Graph::update dans le .cpp
@@ -316,6 +362,9 @@ class Graph
         ///nombre d'arrete du graphe
         int m_nb_arete;
 
+        ///capacité de portage (places dispo) de l'environnement
+        int m_capacity;
+
 
     public:
 
@@ -323,6 +372,16 @@ class Graph
         /// Ici on ne donne qu'un seul constructeur qui peut utiliser une interface
         Graph (GraphInterface *interface=nullptr) :
             m_interface(interface)  {  }
+
+        //Getters et setters
+        int get_ordre(){return m_ordre;}
+        void set_ordre(int _ordre){m_ordre=_ordre;}
+
+        int get_nb_arete(){return m_nb_arete;}
+        void set_nb_arete(int _nb_arete){m_nb_arete=_nb_arete;}
+
+        int get_capacity(){return m_capacity;}
+        void set_capacity(int _capacity){m_capacity=_capacity;}
 
         void add_interfaced_vertex(int idx, double value, int x, int y, std::string pic_name="", int pic_idx=0 );
         void add_interfaced_edge(int idx, int vert1, int vert2, double weight=0);
