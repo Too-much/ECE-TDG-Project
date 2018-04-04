@@ -13,7 +13,7 @@ Vertex::Vertex(std::ifstream& fc)
     fc >> m_value;
     fc >> m_hunger;
     m_interface=nullptr;
-    m_growth = 4;
+    m_growth = 6;
 }
 
 /// Le constructeur met en place les éléments de l'interface
@@ -21,12 +21,12 @@ VertexInterface::VertexInterface(int idx, int x, int y, std::string pic_name, in
 {
     // La boite englobante
     m_top_box.set_pos(x, y);
-    m_top_box.set_dim(130, 100);
+    m_top_box.set_dim(130, 100); // Change la taille des box des SOMMETS
     m_top_box.set_moveable();
 
     // Le slider de réglage de valeur
     m_top_box.add_child( m_slider_value );
-    m_slider_value.set_range(0.0, 100.0);  // Valeurs arbitraires, à adapter...
+    m_slider_value.set_range(0.0, 100.0);  // CHANGE LA RANGE DES SLIDERS DES SOMMETS
     m_slider_value.set_dim(20,80);
     m_slider_value.set_gravity_xy(grman::GravityX::Left, grman::GravityY::Up);
 
@@ -62,17 +62,11 @@ VertexInterface::VertexInterface(int idx, int x, int y, std::string pic_name, in
         m_top_box.set_bg_color(VERTSOMBRE);
     if(growth==4)
         m_top_box.set_bg_color(VERT);
-    if(growth>=5)
+    if(growth==5)
         m_top_box.set_bg_color(VERTCLAIR);
+    if(growth>=6)
+        m_top_box.set_bg_color(BLANC);
 
-}
-
-void VertexInterface::evoCouleur(int color)
-{
-    if(color>=1)
-        m_top_box.set_bg_color(VERT);
-    if(color<1)
-        m_top_box.set_bg_color(ROUGE);
 }
 
 /// Gestion du Vertex avant l'appel à l'interface
@@ -86,6 +80,10 @@ void Vertex::pre_update()
 
     /// Copier la valeur locale de la donnée m_value vers le label sous le slider
     m_interface->m_label_value.set_message( std::to_string( (int)m_value) );
+
+    m_pos_x = m_interface->m_top_box.get_posx();
+    m_pos_y = m_interface->m_top_box.get_posy();
+    m_value = m_interface->m_slider_value.get_value();
 }
 
 
@@ -110,6 +108,7 @@ Edge::Edge(std::ifstream& fc)
 {
     fc >> m_from;
     fc >> m_to;
+    fc >> m_weight;
     m_interface=nullptr;
 }
 
@@ -133,7 +132,7 @@ EdgeInterface::EdgeInterface(Vertex& from, Vertex& to, double weight)
 
     // Le slider de réglage de valeur
     m_box_edge.add_child( m_slider_weight );
-    m_slider_weight.set_range(0.0, 100.0);  // Valeurs arbitraires, à adapter...
+    m_slider_weight.set_range(0.0, 100.0);  // CHANGE LA RANGE DES SLIDERS DES ARETES
     m_slider_weight.set_dim(16,40);
     m_slider_weight.set_gravity_y(grman::GravityY::Up);
 
@@ -141,26 +140,6 @@ EdgeInterface::EdgeInterface(Vertex& from, Vertex& to, double weight)
     m_box_edge.add_child( m_label_weight );
     m_label_weight.set_gravity_y(grman::GravityY::Down);
 
-    if(weight>=90&&weight<100)
-        m_top_edge.setEdgeColor(NOIR);
-    if(weight>=80&&weight<90)
-        m_top_edge.setEdgeColor(GRISSOMBRE);
-    if(weight>=70&&weight<80)
-        m_top_edge.setEdgeColor(GRIS);
-    if(weight>=60&&weight<70)
-        m_top_edge.setEdgeColor(GRISCLAIR);
-    if(weight>=50&&weight<60)
-        m_top_edge.setEdgeColor(ROUGESOMBRE);
-    if(weight>=40&&weight<50)
-        m_top_edge.setEdgeColor(ROUGE);
-    if(weight>=30&&weight<40)
-        m_top_edge.setEdgeColor(ROUGECLAIR);
-    if(weight>=20&&weight<30)
-        m_top_edge.setEdgeColor(VERTSOMBRE);
-    if(weight>=10&&weight<20)
-        m_top_edge.setEdgeColor(VERT);
-    if(weight>=0&&weight<10)
-        m_top_edge.setEdgeColor(VERTCLAIR);
 }
 
 
@@ -170,6 +149,27 @@ void Edge::pre_update()
 {
     if (!m_interface)
         return;
+
+    if(m_weight>=90&&m_weight<100)
+        m_interface->m_top_edge.setEdgeColor(NOIR);
+    if(m_weight>=80&&m_weight<90)
+        m_interface->m_top_edge.setEdgeColor(GRISSOMBRE);
+    if(m_weight>=70&&m_weight<80)
+        m_interface->m_top_edge.setEdgeColor(GRIS);
+    if(m_weight>=60&&m_weight<70)
+        m_interface->m_top_edge.setEdgeColor(GRISCLAIR);
+    if(m_weight>=50&&m_weight<60)
+        m_interface->m_top_edge.setEdgeColor(ROUGESOMBRE);
+    if(m_weight>=40&&m_weight<50)
+        m_interface->m_top_edge.setEdgeColor(ROUGE);
+    if(m_weight>=30&&m_weight<40)
+        m_interface->m_top_edge.setEdgeColor(ROUGECLAIR);
+    if(m_weight>=20&&m_weight<30)
+        m_interface->m_top_edge.setEdgeColor(VERTSOMBRE);
+    if(m_weight>=10&&m_weight<20)
+        m_interface->m_top_edge.setEdgeColor(VERT);
+    if(m_weight>=0&&m_weight<10)
+        m_interface->m_top_edge.setEdgeColor(VERTCLAIR);
 
     /// Copier la valeur locale de la donnée m_weight vers le slider associé
     m_interface->m_slider_weight.set_value(m_weight);
@@ -360,6 +360,7 @@ void Graph::save_graph(std::string nom_fichier)
             fc << it->second.m_pos_x << " ";
             fc << it->second.m_pos_y << " ";
             fc << it->second.m_value << " ";
+            fc << it->second.m_hunger << " ";
         }
     }
 
@@ -379,7 +380,12 @@ void Graph::update()
         elt.second.pre_update();
 
     for (auto &elt : m_edges)
+    {
+        elt.second.m_weight = m_vertices[elt.second.m_to].m_hunger * m_vertices[elt.second.m_to].m_value;
+        if (elt.second.m_weight > 100)
+            elt.second.m_weight = 100;
         elt.second.pre_update();
+    }
 
     m_interface->m_top_box.update();
 

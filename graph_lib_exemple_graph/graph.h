@@ -120,7 +120,6 @@ class VertexInterface
         // Le constructeur met en place les éléments de l'interface
         // voir l'implémentation dans le .cpp
         VertexInterface(int idx, int x, int y, std::string pic_name="", int pic_idx=0,int growth=0);
-        void evoCouleur(int color);
 };
 
 
@@ -169,6 +168,9 @@ class Vertex
 
         ///faim
         float m_hunger;
+
+        /// Si on supprime le sommet ou non
+        bool m_active;
 
         /// le POINTEUR sur l'interface associée, nullptr -> pas d'interface
         //std::shared_ptr<VertexInterface> m_interface = nullptr;
@@ -254,6 +256,9 @@ class Edge
 
         /// un exemple de donnée associée à l'arc, on peut en ajouter d'autres...
         double m_weight;
+
+        ///Si supression ou non
+        bool m_active;
 
         /// le POINTEUR sur l'interface associée, nullptr -> pas d'interface
         //std::shared_ptr<EdgeInterface> m_interface = nullptr;

@@ -14,7 +14,6 @@ int main()
     /// Un exemple de graphe
     Graph g;
     g.load_graph("countryside");
-    //g.save_graph("countryside");
     g.initTabAdja();
     g.make_example();
 
@@ -23,6 +22,7 @@ int main()
     /// ( contrairement à des frameworks plus avancés )
     while ( !key[KEY_ESC] )
     {
+        g.save_graph("countryside");
         /// Il faut appeler les méthodes d'update des objets qui comportent des widgets
         g.update();
 
