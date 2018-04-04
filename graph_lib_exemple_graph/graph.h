@@ -167,6 +167,8 @@ class Vertex
         int m_pos_x;
         int m_pos_y;
 
+        ///faim
+        float m_hunger;
 
         /// le POINTEUR sur l'interface associée, nullptr -> pas d'interface
         //std::shared_ptr<VertexInterface> m_interface = nullptr;
@@ -256,6 +258,8 @@ class Edge
         /// le POINTEUR sur l'interface associée, nullptr -> pas d'interface
         //std::shared_ptr<EdgeInterface> m_interface = nullptr;
         EdgeInterface * m_interface = nullptr;
+
+
 
 
     public:

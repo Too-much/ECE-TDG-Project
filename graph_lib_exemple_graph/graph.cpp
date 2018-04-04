@@ -11,8 +11,9 @@ Vertex::Vertex(std::ifstream& fc)
     fc >> m_pos_x;
     fc >> m_pos_y;
     fc >> m_value;
+    fc >> m_hunger;
     m_interface=nullptr;
-    m_growth = 1.05;
+    m_growth = 4;
 }
 
 /// Le constructeur met en place les éléments de l'interface
@@ -109,7 +110,6 @@ Edge::Edge(std::ifstream& fc)
 {
     fc >> m_from;
     fc >> m_to;
-    fc >> m_weight;
     m_interface=nullptr;
 }
 
@@ -141,25 +141,25 @@ EdgeInterface::EdgeInterface(Vertex& from, Vertex& to, double weight)
     m_box_edge.add_child( m_label_weight );
     m_label_weight.set_gravity_y(grman::GravityY::Down);
 
-    if(weight>=0&&weight<10)
-        m_top_edge.setEdgeColor(NOIR);
-    if(weight>=10&&weight<20)
-        m_top_edge.setEdgeColor(GRISSOMBRE);
-    if(weight>=20&&weight<30)
-        m_top_edge.setEdgeColor(GRIS);
-    if(weight>=30&&weight<40)
-        m_top_edge.setEdgeColor(GRISCLAIR);
-    if(weight>=40&&weight<50)
-        m_top_edge.setEdgeColor(ROUGESOMBRE);
-    if(weight>=50&&weight<60)
-        m_top_edge.setEdgeColor(ROUGE);
-    if(weight>=60&&weight<70)
-        m_top_edge.setEdgeColor(ROUGECLAIR);
-    if(weight>=70&&weight<80)
-        m_top_edge.setEdgeColor(VERTSOMBRE);
-    if(weight>=80&&weight<90)
-        m_top_edge.setEdgeColor(VERT);
     if(weight>=90&&weight<100)
+        m_top_edge.setEdgeColor(NOIR);
+    if(weight>=80&&weight<90)
+        m_top_edge.setEdgeColor(GRISSOMBRE);
+    if(weight>=70&&weight<80)
+        m_top_edge.setEdgeColor(GRIS);
+    if(weight>=60&&weight<70)
+        m_top_edge.setEdgeColor(GRISCLAIR);
+    if(weight>=50&&weight<60)
+        m_top_edge.setEdgeColor(ROUGESOMBRE);
+    if(weight>=40&&weight<50)
+        m_top_edge.setEdgeColor(ROUGE);
+    if(weight>=30&&weight<40)
+        m_top_edge.setEdgeColor(ROUGECLAIR);
+    if(weight>=20&&weight<30)
+        m_top_edge.setEdgeColor(VERTSOMBRE);
+    if(weight>=10&&weight<20)
+        m_top_edge.setEdgeColor(VERT);
+    if(weight>=0&&weight<10)
         m_top_edge.setEdgeColor(VERTCLAIR);
 }
 
@@ -322,6 +322,11 @@ void Graph::load_graph(std::string nom_fichier)
     else
     {
         std::cout << "Error lors du chargement du fichier !" << std::endl;
+    }
+
+    for(std::map<int, Edge>::iterator it(m_edges.begin()); it!=m_edges.end(); ++it)
+    {
+        it->second.m_weight=m_vertices[it->second.m_to].m_value*m_vertices[it->second.m_to].m_hunger;
     }
 }
 
