@@ -16,7 +16,7 @@ Vertex::Vertex(std::ifstream& fc)
 }
 
 /// Le constructeur met en place les éléments de l'interface
-VertexInterface::VertexInterface(int idx, int x, int y, std::string pic_name, int pic_idx)
+VertexInterface::VertexInterface(int idx, int x, int y, std::string pic_name, int pic_idx,int growth)
 {
     // La boite englobante
     m_top_box.set_pos(x, y);
@@ -50,8 +50,29 @@ VertexInterface::VertexInterface(int idx, int x, int y, std::string pic_name, in
 
     m_box_label_idx.add_child( m_label_idx );
     m_label_idx.set_message( std::to_string(idx) );
+
+    if(growth==0)
+        m_top_box.set_bg_color(ROUGESOMBRE);
+    if(growth==1)
+        m_top_box.set_bg_color(ROUGE);
+    if(growth==2)
+        m_top_box.set_bg_color(ROUGECLAIR);
+    if(growth==3)
+        m_top_box.set_bg_color(VERTSOMBRE);
+    if(growth==4)
+        m_top_box.set_bg_color(VERT);
+    if(growth>=5)
+        m_top_box.set_bg_color(VERTCLAIR);
+
 }
 
+void VertexInterface::evoCouleur(int color)
+{
+    if(color>=1)
+        m_top_box.set_bg_color(VERT);
+    if(color<1)
+        m_top_box.set_bg_color(ROUGE);
+}
 
 /// Gestion du Vertex avant l'appel à l'interface
 void Vertex::pre_update()
@@ -93,7 +114,7 @@ Edge::Edge(std::ifstream& fc)
 }
 
 /// Le constructeur met en place les éléments de l'interface
-EdgeInterface::EdgeInterface(Vertex& from, Vertex& to)
+EdgeInterface::EdgeInterface(Vertex& from, Vertex& to, double weight)
 {
     // Le WidgetEdge de l'interface de l'arc
     if ( !(from.m_interface && to.m_interface) )
@@ -120,7 +141,28 @@ EdgeInterface::EdgeInterface(Vertex& from, Vertex& to)
     m_box_edge.add_child( m_label_weight );
     m_label_weight.set_gravity_y(grman::GravityY::Down);
 
+    if(weight>=0&&weight<10)
+        m_top_edge.setEdgeColor(NOIR);
+    if(weight>=10&&weight<20)
+        m_top_edge.setEdgeColor(GRISSOMBRE);
+    if(weight>=20&&weight<30)
+        m_top_edge.setEdgeColor(GRIS);
+    if(weight>=30&&weight<40)
+        m_top_edge.setEdgeColor(GRISCLAIR);
+    if(weight>=40&&weight<50)
+        m_top_edge.setEdgeColor(ROUGESOMBRE);
+    if(weight>=50&&weight<60)
+        m_top_edge.setEdgeColor(ROUGE);
+    if(weight>=60&&weight<70)
+        m_top_edge.setEdgeColor(ROUGECLAIR);
+    if(weight>=70&&weight<80)
+        m_top_edge.setEdgeColor(VERTSOMBRE);
+    if(weight>=80&&weight<90)
+        m_top_edge.setEdgeColor(VERT);
+    if(weight>=90&&weight<100)
+        m_top_edge.setEdgeColor(VERTCLAIR);
 }
+
 
 
 /// Gestion du Edge avant l'appel à l'interface
@@ -186,7 +228,7 @@ void Graph::make_example()
 
     for(std::map<int, Vertex>::iterator it(m_vertices.begin()); it!=m_vertices.end(); ++it)
     {
-        add_interfaced_vertex(it->first, it->second.m_value, it->second.m_pos_x, it->second.m_pos_y, it->second.m_namePicture);
+        add_interfaced_vertex(it->first, it->second.m_value, it->second.m_pos_x, it->second.m_pos_y, it->second.m_namePicture,0,it->second.m_growth);
     }
     /// Les sommets doivent être définis avant les arcs
     // Ajouter le sommet d'indice 0 de valeur 30 en x=200 et y=100 avec l'image clown1.jpg etc...
@@ -345,7 +387,8 @@ void Graph::update()
 }
 
 /// Aide à l'ajout de sommets interfacés
-void Graph::add_interfaced_vertex(int idx, double value, int x, int y, std::string pic_name, int pic_idx )
+void Graph::add_interfaced_vertex(int idx, double value, int x, int y, std::string pic_name, int pic_idx, int growthcolor)
+
 {
 //    if ( m_vertices.find(idx)!=m_vertices.end() )
 //    {
@@ -354,7 +397,7 @@ void Graph::add_interfaced_vertex(int idx, double value, int x, int y, std::stri
 //    }
 
     // Création d'une interface de sommet
-    VertexInterface *vi = new VertexInterface(idx, x, y, pic_name, pic_idx);
+    VertexInterface *vi = new VertexInterface(idx, x, y, pic_name, pic_idx, growthcolor);
     // Ajout de la top box de l'interface de sommet
     m_interface->m_main_box.add_child(vi->m_top_box);
     m_vertices[idx].m_interface = vi;
@@ -379,7 +422,7 @@ void Graph::add_interfaced_edge(int idx, int id_vert1, int id_vert2, double weig
 //    }
 
     // Création d'une interface d'arete
-    EdgeInterface *ei = new EdgeInterface(m_vertices[id_vert1], m_vertices[id_vert2]);
+    EdgeInterface *ei = new EdgeInterface(m_vertices[id_vert1], m_vertices[id_vert2], weight);
     // Ajout de la top box de l'interface de l'arete
     m_interface->m_main_box.add_child(ei->m_top_edge);
     m_edges[idx].m_interface = ei;

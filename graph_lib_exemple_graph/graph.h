@@ -119,7 +119,8 @@ class VertexInterface
 
         // Le constructeur met en place les éléments de l'interface
         // voir l'implémentation dans le .cpp
-        VertexInterface(int idx, int x, int y, std::string pic_name="", int pic_idx=0);
+        VertexInterface(int idx, int x, int y, std::string pic_name="", int pic_idx=0,int growth=0);
+        void evoCouleur(int color);
 };
 
 
@@ -231,7 +232,7 @@ class EdgeInterface
 
         // Le constructeur met en place les éléments de l'interface
         // voir l'implémentation dans le .cpp
-        EdgeInterface(Vertex& from, Vertex& to);
+        EdgeInterface(Vertex& from, Vertex& to, double weight=0);
 };
 
 
@@ -370,7 +371,8 @@ class Graph
         int get_capacity(){return m_capacity;}
         void set_capacity(int _capacity){m_capacity=_capacity;}
 
-        void add_interfaced_vertex(int idx, double value, int x, int y, std::string pic_name="", int pic_idx=0 );
+        void add_interfaced_vertex(int idx, double value, int x, int y, std::string pic_name="", int pic_idx=0, int growthcolor=0);
+
         void add_interfaced_edge(int idx, int vert1, int vert2, double weight=0);
 
         /// Méthode spéciale qui construit un graphe arbitraire (démo)
