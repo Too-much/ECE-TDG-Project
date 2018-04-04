@@ -4,6 +4,14 @@
                     VERTEX
 ****************************************************/
 
+/// Constructor par defaut de VERTEX
+Vertex::Vertex(std::ifstream& fc)
+{
+    getline(fc, m_namePicture, '#');
+    m_value=0;
+    m_interface=nullptr;
+}
+
 /// Le constructeur met en place les éléments de l'interface
 VertexInterface::VertexInterface(int idx, int x, int y, std::string pic_name, int pic_idx)
 {
@@ -71,6 +79,15 @@ void Vertex::post_update()
 /***************************************************
                     EDGE
 ****************************************************/
+
+///Constructor par défaut de Edge
+Edge::Edge(std::ifstream& fc)
+{
+    fc >> m_from;
+    fc >> m_to;
+    fc >> m_weight;
+    m_interface=nullptr;
+}
 
 /// Le constructeur met en place les éléments de l'interface
 EdgeInterface::EdgeInterface(Vertex& from, Vertex& to)
@@ -166,29 +183,15 @@ void Graph::make_example()
 
     /// Les sommets doivent être définis avant les arcs
     // Ajouter le sommet d'indice 0 de valeur 30 en x=200 et y=100 avec l'image clown1.jpg etc...
-    add_interfaced_vertex(0, 30.0, 100, 450, "secondary_consumer1.jpg");
-    add_interfaced_vertex(1, 60.0, 260, 150, "primary_producer2.jpg");
-    add_interfaced_vertex(2,  50.0, 30, 250, "primary_producer1.png");
-    add_interfaced_vertex(3,  0.0, 200, 600, "decomposer2.jpg");
-    add_interfaced_vertex(4,  100.0, 600, 600, "decomposer1.jpg");
-    add_interfaced_vertex(5,  0.0, 400, 450, "primary_consumer1.jpg");
-    add_interfaced_vertex(6,  0.0, 600, 100, "tertiary_consumer1.jpg");
-    add_interfaced_vertex(7,  0.0, 650, 470, "primary_consumer2.jpg");
+    add_interfaced_vertex(0, 30.0, 100, 450, m_vertices[0].m_namePicture + ".jpg");
+    add_interfaced_vertex(1, 60.0, 260, 150, m_vertices[1].m_namePicture + ".jpg");
+    add_interfaced_vertex(2,  50.0, 30, 250, m_vertices[2].m_namePicture + ".jpg");
 
     /// Les arcs doivent être définis entre des sommets qui existent !
     // AJouter l'arc d'indice 0, allant du sommet 1 au sommet 2 de poids 50 etc...
-    add_interfaced_edge(0, 7, 4, 50.0);
-    add_interfaced_edge(1, 1, 7, 50.0);
-    add_interfaced_edge(2, 7, 6, 75.0);
-    add_interfaced_edge(3, 5, 0, 25.0);
-    add_interfaced_edge(4, 5, 6, 25.0);
-    add_interfaced_edge(5, 2, 5, 25.0);
-    add_interfaced_edge(6, 5, 3, 0.0);
-    add_interfaced_edge(7, 4, 7, 100.0);
-    add_interfaced_edge(8, 6, 3, 20.0);
-    add_interfaced_edge(9, 0, 3, 80.0);
-    add_interfaced_edge(10, 3, 5, 80.0);
-
+    add_interfaced_edge(0, 1, 2, 50.0);
+    add_interfaced_edge(1, 2, 0, 50.0);
+    add_interfaced_edge(2, 1, 0, 75.0);
 
 }
 
@@ -205,10 +208,10 @@ void Graph::initTabAdja()
     }
 
     ///on donne les valeurs du fichier au tableau d'adjacense
-    for(int i=0; i<m_nb_arete; i++)
+    for(std::map<int, Edge>::iterator it = m_edges.begin(); it != m_edges.end(); ++it)
     {
-        m_adjacensePoids[m_edges[i].m_from][m_edges[i].m_to]=m_edges[i].m_weight;
-        m_adjacensePoids[m_edges[i].m_to][m_edges[i].m_from]=m_edges[i].m_weight;
+        m_adjacensePoids[it->second.m_from][it->second.m_to]=it->second.m_weight;
+        m_adjacensePoids[it->second.m_to][it->second.m_from]=it->second.m_weight;
     }
 
     ///on affiche le tableau d'adjacense
@@ -223,35 +226,49 @@ void Graph::initTabAdja()
     }
     std::cout<<std::endl<<std::endl<<std::endl;
 
-
+    // VERIFE
     for(std::map<int, Edge>::iterator it = m_edges.begin(); it != m_edges.end(); ++it)
     {
-        std::cout << "clef " << it->first << " Présentation : " << it->second.m_weight<< std::endl;
+        std::cout << "clef " << it->first << " Présentation : " << it->second.m_from << " " << it->second.m_to << " " << it->second.m_weight << std::endl;
+    }
+
+    for(std::map<int, Vertex>::iterator it(m_vertices.begin()); it!=m_vertices.end(); ++it)
+    {
+        std::cout << it->second.m_namePicture << " ";
     }
 
 
 }
 
+// Methode de telechargement des données depuis un fichier
 void Graph::load_graph(std::string nom_fichier)
 {
+    // Modife du nom de fichier pour fonction stream
     nom_fichier = nom_fichier + ".txt";
-    std::ifstream fc(nom_fichier.c_str(), std::ios::in);
+    std::ifstream fc(nom_fichier.c_str(), std::ios::in); // Ouverture
 
+    // Condition en cas d'échec
     if(!fc.fail())
     {
+        // Recup nb sommet et nb arete
         fc >> m_ordre;
         fc >> m_nb_arete;
 
+        // Rempli la map d'arete
         for(int i(0); i<m_nb_arete; ++i)
         {
-            fc >> m_edges[i].m_from;
-            fc >> m_edges[i].m_to;
-            fc >> m_edges[i].m_weight;
+            int recup(0);
+            fc >> recup;
+
+            m_edges.insert(std::pair<int,Edge>(recup,Edge(fc)));
         }
 
+        // Rempli la map de sommet
         for(int i(0); i<m_ordre; ++i)
         {
-            getline(fc, m_vertices[i].m_namePicture,'#');
+            int recup(0);
+            fc >> recup;
+            m_vertices.insert(std::pair<int,Vertex>(recup,Vertex(fc)));
         }
     }
 
@@ -263,24 +280,31 @@ void Graph::load_graph(std::string nom_fichier)
 
 void Graph::save_graph(std::string nom_fichier)
 {
+    // Modife du nom de fichier pour fonction stream
     nom_fichier = nom_fichier + ".txt";
-    std::ofstream fc(nom_fichier.c_str(), std::ios::out);
+    std::ofstream fc(nom_fichier.c_str(), std::ios::out); // Ouverture
 
+    // Condition en cas d'échec
     if(!fc.fail())
     {
+        // Ecrit le nb sommet et nb arete
         fc << m_ordre << " ";
         fc << m_nb_arete << " ";
 
-        for(int i(0); i<m_nb_arete; ++i)
+        // Ecrit la map EDGE dans le fichier
+        for(std::map<int, Edge>::iterator it(m_edges.begin()); it!=m_edges.end(); ++it)
         {
-            fc << m_edges[i].m_from << " ";
-            fc << m_edges[i].m_to << " ";
-            fc << m_edges[i].m_weight << " ";
+            fc << it->first << " ";
+            fc << it->second.m_from << " ";
+            fc << it->second.m_to << " ";
+            fc << it->second.m_weight << " ";
         }
 
-        for(int i(0); i<m_ordre; ++i)
+        // Ecrit la map VERTEX dans le fichier
+        for(std::map<int, Vertex>::iterator it(m_vertices.begin()); it!=m_vertices.end(); ++it)
         {
-            fc << m_vertices[i].m_namePicture << "#";
+            fc << it->first;
+            fc << it->second.m_namePicture << "#";
         }
     }
 
@@ -315,36 +339,42 @@ void Graph::update()
 /// Aide à l'ajout de sommets interfacés
 void Graph::add_interfaced_vertex(int idx, double value, int x, int y, std::string pic_name, int pic_idx )
 {
-    if ( m_vertices.find(idx)!=m_vertices.end() )
-    {
-        std::cerr << "Error adding vertex at idx=" << idx << " already used..." << std::endl;
-        throw "Error adding vertex";
-    }
+//    if ( m_vertices.find(idx)!=m_vertices.end() )
+//    {
+//        std::cerr << "Error adding vertex at idx=" << idx << " already used..." << std::endl;
+//        throw "Error adding vertex";
+//    }
+
     // Création d'une interface de sommet
     VertexInterface *vi = new VertexInterface(idx, x, y, pic_name, pic_idx);
     // Ajout de la top box de l'interface de sommet
     m_interface->m_main_box.add_child(vi->m_top_box);
+    m_vertices[idx].m_interface = vi;
+
     // On peut ajouter directement des vertices dans la map avec la notation crochet :
-    m_vertices[idx] = Vertex(value, vi);
+    ///m_vertices[idx] = Vertex(value,vi);
 }
 
 /// Aide à l'ajout d'arcs interfacés
 void Graph::add_interfaced_edge(int idx, int id_vert1, int id_vert2, double weight)
 {
-    if ( m_edges.find(idx)!=m_edges.end() )
-    {
-        std::cerr << "Error adding edge at idx=" << idx << " already used..." << std::endl;
-        throw "Error adding edge";
-    }
+//    if ( m_edges.find(idx)!=m_edges.end() )
+//    {
+//        std::cerr << "Error adding edge at idx=" << idx << " already used..." << std::endl;
+//        throw "Error adding edge";
+//    }
+//
+//    if ( m_vertices.find(id_vert1)==m_vertices.end() || m_vertices.find(id_vert2)==m_vertices.end() )
+//    {
+//        std::cerr << "Error adding edge idx=" << idx << " between vertices " << id_vert1 << " and " << id_vert2 << " not in m_vertices" << std::endl;
+//        throw "Error adding edge";
+//    }
 
-    if ( m_vertices.find(id_vert1)==m_vertices.end() || m_vertices.find(id_vert2)==m_vertices.end() )
-    {
-        std::cerr << "Error adding edge idx=" << idx << " between vertices " << id_vert1 << " and " << id_vert2 << " not in m_vertices" << std::endl;
-        throw "Error adding edge";
-    }
-
+    // Création d'une interface d'arete
     EdgeInterface *ei = new EdgeInterface(m_vertices[id_vert1], m_vertices[id_vert2]);
+    // Ajout de la top box de l'interface de l'arete
     m_interface->m_main_box.add_child(ei->m_top_edge);
-    m_edges[idx] = Edge(weight, ei);
+    m_edges[idx].m_interface = ei;
+    //m_edges[idx] = Edge(weight, ei);
 }
 

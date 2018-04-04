@@ -13,10 +13,10 @@ int main()
 
     /// Un exemple de graphe
     Graph g;
-    g.make_example();
     g.load_graph("countryside");
     g.save_graph("countryside");
     g.initTabAdja();
+    g.make_example();
 
 
     /// Vous gardez la main sur la "boucle de jeu"

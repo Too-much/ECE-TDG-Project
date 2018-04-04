@@ -146,7 +146,9 @@ class Vertex
         std::string m_namePicture;
 
         /// le POINTEUR sur l'interface associée, nullptr -> pas d'interface
-        std::shared_ptr<VertexInterface> m_interface = nullptr;
+        //std::shared_ptr<VertexInterface> m_interface = nullptr;
+        VertexInterface * m_interface = nullptr;
+
 
         // Docu shared_ptr : https://msdn.microsoft.com/fr-fr/library/hh279669.aspx
         // La ligne précédente est en gros équivalent à la ligne suivante :
@@ -156,6 +158,10 @@ class Vertex
     public:
 
         /// Les constructeurs sont à compléter selon vos besoin...
+
+        /// Constructor par defaut
+        Vertex(std::ifstream& fc);
+
         /// Ici on ne donne qu'un seul constructeur qui peut utiliser une interface
         Vertex (double value=0, VertexInterface *interface=nullptr) :
             m_value(value), m_interface(interface)  {  }
@@ -224,12 +230,16 @@ class Edge
         double m_weight;
 
         /// le POINTEUR sur l'interface associée, nullptr -> pas d'interface
-        std::shared_ptr<EdgeInterface> m_interface = nullptr;
+        //std::shared_ptr<EdgeInterface> m_interface = nullptr;
+        EdgeInterface * m_interface = nullptr;
 
 
     public:
 
         /// Les constructeurs sont à compléter selon vos besoin...
+
+        /// Constructor par defaut
+        Edge(std::ifstream& fc);
         /// Ici on ne donne qu'un seul constructeur qui peut utiliser une interface
         Edge (double weight=0, EdgeInterface *interface=nullptr) :
             m_weight(weight), m_interface(interface)  {  }
