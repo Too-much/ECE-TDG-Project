@@ -162,6 +162,11 @@ class Vertex
         /// Nom de l'image associée
         std::string m_namePicture;
 
+        /// Position en x et y
+        int m_pos_x;
+        int m_pos_y;
+
+
         /// le POINTEUR sur l'interface associée, nullptr -> pas d'interface
         //std::shared_ptr<VertexInterface> m_interface = nullptr;
         VertexInterface * m_interface = nullptr;
@@ -183,25 +188,7 @@ class Vertex
         Vertex (double value=0, VertexInterface *interface=nullptr) :
             m_value(value), m_interface(interface)  {  }
 
-  /**      ///getters et setters
-        double get_value(){return m_value;}
-        void set_value(double _value){m_value=_value;}
 
-        bool get_marque(){return m_marque;}
-        void set_marque(bool _marque){m_marque=_marque;}
-
-        std::string get_name(){return m_name;}
-        void set_name(std::string _name){m_name=_name;}
-
-        std::string get_namePicture(){return m_namePicture;}
-        void set_namePicture(std::string _namePicture){m_namePicture=_namePicture;}
-
-        float get_growth(){return m_growth;}
-        void set_growth(float _growth){m_growth=_growth;}
-
-        int get_usedSpace(){return m_usedSpace;}
-        void set_usedSpace(int _usedSpace){m_usedSpace=_usedSpace;}
- */
         /// Vertex étant géré par Graph ce sera la méthode update de graph qui appellera
         /// le pre_update et post_update de Vertex (pas directement la boucle de jeu)
         /// Voir l'implémentation Graph::update dans le .cpp

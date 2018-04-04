@@ -8,8 +8,11 @@
 Vertex::Vertex(std::ifstream& fc)
 {
     getline(fc, m_namePicture, '#');
-    m_value=0;
+    fc >> m_pos_x;
+    fc >> m_pos_y;
+    fc >> m_value;
     m_interface=nullptr;
+    m_growth = 1.05;
 }
 
 /// Le constructeur met en place les éléments de l'interface
@@ -181,18 +184,20 @@ void Graph::make_example()
     // La ligne précédente est en gros équivalente à :
     // m_interface = new GraphInterface(50, 0, 750, 600);
 
+    for(std::map<int, Vertex>::iterator it(m_vertices.begin()); it!=m_vertices.end(); ++it)
+    {
+        add_interfaced_vertex(it->first, it->second.m_value, it->second.m_pos_x, it->second.m_pos_y, it->second.m_namePicture);
+    }
     /// Les sommets doivent être définis avant les arcs
     // Ajouter le sommet d'indice 0 de valeur 30 en x=200 et y=100 avec l'image clown1.jpg etc...
-    add_interfaced_vertex(0, 30.0, 100, 450, m_vertices[0].m_namePicture + ".jpg");
-    add_interfaced_vertex(1, 60.0, 260, 150, m_vertices[1].m_namePicture + ".jpg");
-    add_interfaced_vertex(2,  50.0, 30, 250, m_vertices[2].m_namePicture + ".jpg");
 
     /// Les arcs doivent être définis entre des sommets qui existent !
     // AJouter l'arc d'indice 0, allant du sommet 1 au sommet 2 de poids 50 etc...
-    add_interfaced_edge(0, 1, 2, 50.0);
-    add_interfaced_edge(1, 2, 0, 50.0);
-    add_interfaced_edge(2, 1, 0, 75.0);
 
+    for(std::map<int, Edge>::iterator it(m_edges.begin()); it!=m_edges.end(); ++it)
+    {
+        add_interfaced_edge(it->first, it->second.m_from, it->second.m_to, it->second.m_weight);
+    }
 }
 
 void Graph::initTabAdja()
@@ -234,7 +239,7 @@ void Graph::initTabAdja()
 
     for(std::map<int, Vertex>::iterator it(m_vertices.begin()); it!=m_vertices.end(); ++it)
     {
-        std::cout << it->second.m_namePicture << " ";
+        std::cout << it->second.m_namePicture << " " << it->second.m_pos_x << " " << it->second.m_pos_y << " " << it->second.m_value << " // ";
     }
 
 
@@ -305,6 +310,9 @@ void Graph::save_graph(std::string nom_fichier)
         {
             fc << it->first;
             fc << it->second.m_namePicture << "#";
+            fc << it->second.m_pos_x << " ";
+            fc << it->second.m_pos_y << " ";
+            fc << it->second.m_value << " ";
         }
     }
 
