@@ -115,6 +115,12 @@ class VertexInterface
         // Une boite pour le label précédent
         grman::WidgetText m_box_label_idx;
 
+        //Creation du bouton select de chaque sommet
+        grman::WidgetCheckBox m_select;
+
+        //Nom du sommet
+       // grman::WidgetText m_
+
     public :
 
         // Le constructeur met en place les éléments de l'interface
@@ -170,7 +176,7 @@ class Vertex
         float m_hunger;
 
         /// Si on supprime le sommet ou non
-        bool m_active;
+        bool m_active = true;
 
         /// le POINTEUR sur l'interface associée, nullptr -> pas d'interface
         //std::shared_ptr<VertexInterface> m_interface = nullptr;
@@ -331,6 +337,14 @@ class GraphInterface
         // Boite à outil dans la toolbox
         grman::WidgetBox m_boite_outil;
         grman::WidgetVSlider m_slider_select;
+
+        // Boite de boutton de supression
+        grman::WidgetButton m_buttonDel;
+        grman::WidgetText m_buttonDel_label;
+
+        // Boite de button d'ajout de sommet
+        grman::WidgetButton m_buttonAdd;
+        grman::WidgetText m_buttonAdd_label;
 
 
         // A compléter éventuellement par des widgets de décoration ou

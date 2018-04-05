@@ -44,6 +44,11 @@ VertexInterface::VertexInterface(int idx, int x, int y, std::string pic_name, in
         m_img.set_gravity_x(grman::GravityX::Right);
     }
 
+    // Création d'un boutton sélectionner ou non en haut à gauche de chaque sommet
+    m_img.add_child(m_select);
+    m_select.set_dim(15,15);
+    m_select.set_gravity_xy(grman::GravityX::Right, grman::GravityY::Up);
+
     // Label de visualisation d'index du sommet dans une boite
     m_top_box.add_child( m_box_label_idx );
     m_box_label_idx.set_gravity_xy(grman::GravityX::Right, grman::GravityY::Down);
@@ -209,22 +214,41 @@ GraphInterface::GraphInterface(int x, int y, int w, int h)
     m_tool_box.set_gravity_xy(grman::GravityX::Left, grman::GravityY::Up);
     m_tool_box.set_bg_color(BLANCBLEU);
 
+    // CREATION DU SLIDER SELECT
     m_tool_box.add_child(m_boite_outil);
-    m_boite_outil.set_dim(50,200);          //on crée une seconde boite dans la toolbox
+    m_boite_outil.set_dim(20,60);          //on crée une seconde boite dans la toolbox
     m_boite_outil.set_gravity_xy(grman::GravityX::Center, grman::GravityY::Center);
     m_boite_outil.set_bg_color(JAUNESOMBRE);
-    m_boite_outil.set_moveable();
+    m_boite_outil.set_gravity_xy(grman::GravityX::Right,grman::GravityY::Down);
+
+    //Slider
     m_boite_outil.add_child(m_slider_select);   //on crée un slider dans la dans la seconde boite qui est dans la toolbox
     m_slider_select.set_range(0.0, 100.0);
     m_slider_select.set_dim(16,40);
-    m_slider_select.set_gravity_y(grman::GravityY::Center);
+    m_slider_select.set_gravity_xy(grman::GravityX::Center,grman::GravityY::Up);
 
     // Label de visualisation de valeur de slider select
     m_boite_outil.add_child( m_test_text );
     m_test_text.set_gravity_y(grman::GravityY::Down);
     m_test_text.set_message(std::to_string(m_slider_select.get_value()));
 
+    // BUTTON DE SUPPRESSION DE SOMMET
+    m_tool_box.add_child(m_buttonDel);
+    m_buttonDel.set_dim(70,30);
+    m_buttonDel.set_gravity_xy(grman::GravityX::Center, grman::GravityY::Center);
+    m_buttonDel.set_bg_color(BLANC);
+    m_buttonDel.add_child(m_buttonDel_label);
+    m_buttonDel_label.set_message("DELETE");
 
+    //BUTTON D'AJOUT DE SOMMET
+    m_tool_box.add_child(m_buttonAdd);
+    m_buttonAdd.set_dim(70,30);
+    m_buttonAdd.set_gravity_xy(grman::GravityX::Center, grman::GravityY::Up);
+    m_buttonAdd.set_bg_color(BLANC);
+    m_buttonAdd.add_child(m_buttonAdd_label);
+    m_buttonAdd_label.set_message("ADD");
+
+    // MAIN BOX
     m_top_box.add_child(m_main_box);
     m_main_box.set_dim(908,720);
     m_main_box.set_gravity_xy(grman::GravityX::Right, grman::GravityY::Up);
@@ -242,8 +266,26 @@ void Graph::update()
 
     for (auto &elt : m_vertices)
     {
-        elt.second.m_value= m_interface->m_slider_select.get_value();
-        elt.second.pre_update();
+        if (elt.second.m_active)
+        {
+            if(elt.second.m_interface->m_select.get_value())
+            elt.second.m_value= m_interface->m_slider_select.get_value();
+
+            elt.second.pre_update();
+        }
+
+        if(elt.second.m_interface->m_select.get_value() && m_interface->m_buttonDel.clicked())
+        {
+            elt.second.m_active = false;
+            m_interface->m_main_box.remove_child(elt.second.m_interface->m_top_box);
+            //m_interface->m_tool_box.add_child(elt.second.m_interface->)
+        }
+
+        if(elt.second.m_interface->m_select.get_value() && m_interface->m_buttonAdd.clicked())
+        {
+            elt.second.m_active = true;
+            add_interfaced_vertex(elt.first,elt.second.m_value,elt.second.m_pos_x,elt.second.m_pos_y,elt.second.m_namePicture,0,elt.second.m_growth);
+        }
     }
 
 
@@ -261,8 +303,11 @@ void Graph::update()
 
     for (auto &elt : m_vertices)
     {
-        m_interface->m_test_text.set_message(std::to_string((int)m_interface->m_slider_select.get_value()));
-        elt.second.post_update();
+        if (elt.second.m_active)
+        {
+            m_interface->m_test_text.set_message(std::to_string((int)m_interface->m_slider_select.get_value()));
+            elt.second.post_update();
+        }
     }
 
 
