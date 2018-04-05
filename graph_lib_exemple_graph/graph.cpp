@@ -16,6 +16,7 @@ Vertex::Vertex(std::ifstream& fc)
     fc >> m_value;
     fc >> m_hunger;
     fc >> m_active;
+    fc >> m_saveSupp;
     m_interface=nullptr;
     m_growth = 6;
 }
@@ -258,6 +259,49 @@ GraphInterface::GraphInterface(int x, int y, int w, int h)
     // m_main_box.set_bg_color(BLANCJAUNE);
 }
 
+void Graph::deleteVertex(int i)
+{
+    // Fonction permettant de : - DELETE un sommet
+        //                          - Detruire l'interface du sommet sur la main BOX
+        //                          - Ajoute le sommet dans la TOOLBOX afin de pouvoir le reADD plus tard
+    if( (m_vertices[i].m_interface->m_select.get_value() && m_interface->m_buttonDel.clicked())|| m_vertices[i].m_saveSupp)
+    {
+        int j(0);
+        // Check si il y a déja des sommet enlever pour l'affichage dans la tool bar
+        for (auto &elt2 : m_vertices)
+        {
+            if(elt2.second.m_active || elt2.second.m_saveSupp)
+                j=j+3;
+        }
+        m_vertices[i].m_active = false;
+        m_vertices[i].m_saveSupp = false; // evite de tourner dans ce if pour les sommets DELETED
+
+        m_vertices[i].m_interface->m_select.set_value(false);
+        m_interface->m_main_box.remove_child(m_vertices[i].m_interface->m_top_box);
+        m_interface->m_tool_box.add_child(m_vertices[i].m_interface->m_label_idx);
+
+        m_vertices[i].m_interface->m_label_idx.set_pos(toolX,toolY*j);
+        m_vertices[i].m_interface->m_label_idx.set_message(m_vertices[i].m_namePicture);
+        m_interface->m_tool_box.add_child(m_vertices[i].m_interface->m_select2);
+        m_vertices[i].m_interface->m_select2.set_dim(10,10);
+        m_vertices[i].m_interface->m_select2.set_pos(toolX-15,toolY*j);
+        m_vertices[i].m_interface->m_select2.set_value(false);
+    }
+}
+
+void Graph::addVertex(int i)
+{
+    // Fonction permettant de : - Detruit l'interface du sommet dans la TOOLBOX
+        //                          - Cree l'interface du sommet sur la main BOX
+    if(m_vertices[i].m_interface->m_select2.get_value() && m_interface->m_buttonAdd.clicked())
+    {
+        m_vertices[i].m_active = true;
+        m_vertices[i].m_interface->m_select2.set_value(false);
+        m_interface->m_tool_box.remove_child(m_vertices[i].m_interface->m_label_idx);
+        m_interface->m_tool_box.remove_child(m_vertices[i].m_interface->m_select2);
+        add_interfaced_vertex(i,m_vertices[i].m_value,m_vertices[i].m_pos_x,m_vertices[i].m_pos_y,m_vertices[i].m_namePicture,0,m_vertices[i].m_growth);
+    }
+}
 
 /// La méthode update à appeler dans la boucle de jeu pour les graphes avec interface
 void Graph::update()
@@ -267,44 +311,8 @@ void Graph::update()
 
     for (auto &elt : m_vertices)
     {
-        // Fonction permettant de : - DELETE un sommet
-        //                          - Detruire l'interface du sommet sur la main BOX
-        //                          - Ajoute le sommet dans la TOOLBOX afin de pouvoir le reADD plus tard
-        if(elt.second.m_interface->m_select.get_value() && m_interface->m_buttonDel.clicked())
-        {
-            std::cout << elt.second.m_namePicture << std::endl;
-            elt.second.m_active = false;
-            elt.second.m_interface->m_select.set_value(false);
-            m_interface->m_main_box.remove_child(elt.second.m_interface->m_top_box);
-            m_interface->m_tool_box.add_child(elt.second.m_interface->m_label_idx);
-
-            // Check si il y a déja des sommet enlever pour l'affichage dans la tool bar
-            int i(0);
-            for (auto &elt2 : m_vertices)
-            {
-                if(!elt2.second.m_active)
-                    i=i+3;
-            }
-
-            elt.second.m_interface->m_label_idx.set_pos(toolX,toolY*i);
-            elt.second.m_interface->m_label_idx.set_message(elt.second.m_namePicture);
-            m_interface->m_tool_box.add_child(elt.second.m_interface->m_select2);
-            elt.second.m_interface->m_select2.set_dim(10,10);
-            elt.second.m_interface->m_select2.set_pos(toolX-15,toolY*i);
-            elt.second.m_interface->m_select2.set_value(false);
-        }
-
-
-        // Fonction permettant de : - Detruit l'interface du sommet dans la TOOLBOX
-        //                          - Cree l'interface du sommet sur la main BOX
-        if(elt.second.m_interface->m_select2.get_value() && m_interface->m_buttonAdd.clicked())
-        {
-            elt.second.m_active = true;
-            elt.second.m_interface->m_select2.set_value(false);
-            m_interface->m_tool_box.remove_child(elt.second.m_interface->m_label_idx);
-            m_interface->m_tool_box.remove_child(elt.second.m_interface->m_select2);
-            add_interfaced_vertex(elt.first,elt.second.m_value,elt.second.m_pos_x,elt.second.m_pos_y,elt.second.m_namePicture,0,elt.second.m_growth);
-        }
+        deleteVertex(elt.first);
+        addVertex(elt.first);
 
         // Permet d'init en permanence les slider de chaque sommet
         if(elt.second.m_interface->m_select.get_value() && m_interface->m_selectSlider.get_value())
@@ -566,6 +574,10 @@ void Graph::save_graph(std::string nom_fichier)
             fc << it->second.m_value << " ";
             fc << it->second.m_hunger << " ";
             fc << it->second.m_active << " ";
+            if(!it->second.m_active)
+                fc << true << " ";
+            else
+                fc << it->second.m_saveSupp << " ";
         }
     }
 

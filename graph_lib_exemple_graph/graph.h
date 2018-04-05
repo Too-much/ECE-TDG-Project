@@ -175,6 +175,8 @@ class Vertex
 
         /// Si on supprime le sommet ou non
         bool m_active = true;
+        // Bool pour faire fonctionner la sauvegarde des sommets supp
+        bool m_saveSupp;
 
         /// le POINTEUR sur l'interface associée, nullptr -> pas d'interface
         //std::shared_ptr<VertexInterface> m_interface = nullptr;
@@ -409,6 +411,9 @@ class Graph
 
         /// La méthode update à appeler dans la boucle de jeu pour les graphes avec interface
         void update();
+
+        void deleteVertex(int i);
+        void addVertex(int i);
 
         ///affichage des maps
         void initTabAdja();
