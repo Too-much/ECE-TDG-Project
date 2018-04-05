@@ -117,15 +117,13 @@ class VertexInterface
 
         //Creation du bouton select de chaque sommet
         grman::WidgetCheckBox m_select;
-
-        //Nom du sommet
-       // grman::WidgetText m_
+        grman::WidgetCheckBox m_select2;
 
     public :
 
         // Le constructeur met en place les éléments de l'interface
         // voir l'implémentation dans le .cpp
-        VertexInterface(int idx, int x, int y, std::string pic_name="", int pic_idx=0,int growth=0);
+        VertexInterface(int idx, int x, int y, std::string pic_name="", int pic_idx=0,int growth=0, bool active=0);
 };
 
 
@@ -331,12 +329,10 @@ class GraphInterface
         /// Dans cette boite seront ajoutés des boutons de contrôle etc...
         grman::WidgetBox m_tool_box;
 
-        // Un label de visualisation de la valeur du sommet
-        grman::WidgetText m_test_text;
-
         // Boite à outil dans la toolbox
-        grman::WidgetBox m_boite_outil;
-        grman::WidgetVSlider m_slider_select;
+        grman::WidgetVSlider m_slider;
+        grman::WidgetCheckBox m_selectSlider;
+        grman::WidgetText m_textSlider;
 
         // Boite de boutton de supression
         grman::WidgetButton m_buttonDel;
@@ -401,7 +397,7 @@ class Graph
         int get_capacity(){return m_capacity;}
         void set_capacity(int _capacity){m_capacity=_capacity;}
 
-        void add_interfaced_vertex(int idx, double value, int x, int y, std::string pic_name="", int pic_idx=0, int growthcolor=0);
+        void add_interfaced_vertex(int idx, double value, int x, int y, std::string pic_name="", int pic_idx=0, int growthcolor=0, bool active=0);
 
         void add_interfaced_edge(int idx, int vert1, int vert2, double weight=0);
 

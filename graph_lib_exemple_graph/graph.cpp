@@ -1,5 +1,8 @@
 #include "graph.h"
 
+#define toolX 15
+#define toolY 5
+
 /***************************************************
                     VERTEX
 ****************************************************/
@@ -12,12 +15,13 @@ Vertex::Vertex(std::ifstream& fc)
     fc >> m_pos_y;
     fc >> m_value;
     fc >> m_hunger;
+    fc >> m_active;
     m_interface=nullptr;
     m_growth = 6;
 }
 
 /// Le constructeur met en place les éléments de l'interface
-VertexInterface::VertexInterface(int idx, int x, int y, std::string pic_name, int pic_idx,int growth)
+VertexInterface::VertexInterface(int idx, int x, int y, std::string pic_name, int pic_idx,int growth, bool active)
 {
     // La boite englobante
     m_top_box.set_pos(x, y);
@@ -48,6 +52,7 @@ VertexInterface::VertexInterface(int idx, int x, int y, std::string pic_name, in
     m_img.add_child(m_select);
     m_select.set_dim(15,15);
     m_select.set_gravity_xy(grman::GravityX::Right, grman::GravityY::Up);
+    m_select.set_value(active);
 
     // Label de visualisation d'index du sommet dans une boite
     m_top_box.add_child( m_box_label_idx );
@@ -72,7 +77,6 @@ VertexInterface::VertexInterface(int idx, int x, int y, std::string pic_name, in
         m_top_box.set_bg_color(VERTCLAIR);
     if(growth>=6)
         m_top_box.set_bg_color(BLANC);
-
 }
 
 /// Gestion du Vertex avant l'appel à l'interface
@@ -206,44 +210,41 @@ void Edge::post_update()
 /// éléments qui seront ensuite ajoutés lors de la mise ne place du Graphe
 GraphInterface::GraphInterface(int x, int y, int w, int h)
 {
-    m_top_box.set_dim(1000,740);
-    m_top_box.set_gravity_xy(grman::GravityX::Right, grman::GravityY::Up);
+    m_top_box.set_dim(1020,760);
+    m_top_box.set_gravity_xy(grman::GravityX::Center, grman::GravityY::Center);
 
     m_top_box.add_child(m_tool_box);
-    m_tool_box.set_dim(80,720);
+    m_tool_box.set_dim(100,720);
     m_tool_box.set_gravity_xy(grman::GravityX::Left, grman::GravityY::Up);
     m_tool_box.set_bg_color(BLANCBLEU);
 
     // CREATION DU SLIDER SELECT
-    m_tool_box.add_child(m_boite_outil);
-    m_boite_outil.set_dim(20,60);          //on crée une seconde boite dans la toolbox
-    m_boite_outil.set_gravity_xy(grman::GravityX::Center, grman::GravityY::Center);
-    m_boite_outil.set_bg_color(JAUNESOMBRE);
-    m_boite_outil.set_gravity_xy(grman::GravityX::Right,grman::GravityY::Down);
-
-    //Slider
-    m_boite_outil.add_child(m_slider_select);   //on crée un slider dans la dans la seconde boite qui est dans la toolbox
-    m_slider_select.set_range(0.0, 100.0);
-    m_slider_select.set_dim(16,40);
-    m_slider_select.set_gravity_xy(grman::GravityX::Center,grman::GravityY::Up);
+    m_tool_box.add_child(m_slider);   //on crée un slider dans la dans la seconde boite qui est dans la toolbox
+    m_slider.set_range(0.0, 100.0);
+    m_slider.set_dim(16,40);
+    m_slider.set_gravity_xy(grman::GravityX::Right,grman::GravityY::Down);
+    m_slider.set_bg_color(JAUNESOMBRE);
+    m_tool_box.add_child(m_selectSlider);
+    m_selectSlider.set_dim(30,30);
+    m_selectSlider.set_gravity_xy(grman::GravityX::Center,grman::GravityY::Down);
 
     // Label de visualisation de valeur de slider select
-    m_boite_outil.add_child( m_test_text );
-    m_test_text.set_gravity_y(grman::GravityY::Down);
-    m_test_text.set_message(std::to_string(m_slider_select.get_value()));
+    m_slider.add_child( m_textSlider );
+    m_textSlider.set_gravity_y(grman::GravityY::Down);
+    m_textSlider.set_message(std::to_string(m_slider.get_value()));
 
     // BUTTON DE SUPPRESSION DE SOMMET
     m_tool_box.add_child(m_buttonDel);
-    m_buttonDel.set_dim(70,30);
-    m_buttonDel.set_gravity_xy(grman::GravityX::Center, grman::GravityY::Center);
+    m_buttonDel.set_dim(35,30);
+    m_buttonDel.set_gravity_xy(grman::GravityX::Left, grman::GravityY::Center);
     m_buttonDel.set_bg_color(BLANC);
     m_buttonDel.add_child(m_buttonDel_label);
-    m_buttonDel_label.set_message("DELETE");
+    m_buttonDel_label.set_message("DEL");
 
     //BUTTON D'AJOUT DE SOMMET
     m_tool_box.add_child(m_buttonAdd);
-    m_buttonAdd.set_dim(70,30);
-    m_buttonAdd.set_gravity_xy(grman::GravityX::Center, grman::GravityY::Up);
+    m_buttonAdd.set_dim(35,30);
+    m_buttonAdd.set_gravity_xy(grman::GravityX::Right, grman::GravityY::Center);
     m_buttonAdd.set_bg_color(BLANC);
     m_buttonAdd.add_child(m_buttonAdd_label);
     m_buttonAdd_label.set_message("ADD");
@@ -266,36 +267,76 @@ void Graph::update()
 
     for (auto &elt : m_vertices)
     {
-        if (elt.second.m_active)
-        {
-            if(elt.second.m_interface->m_select.get_value())
-            elt.second.m_value= m_interface->m_slider_select.get_value();
-
-            elt.second.pre_update();
-        }
-
+        // Fonction permettant de : - DELETE un sommet
+        //                          - Detruire l'interface du sommet sur la main BOX
+        //                          - Ajoute le sommet dans la TOOLBOX afin de pouvoir le reADD plus tard
         if(elt.second.m_interface->m_select.get_value() && m_interface->m_buttonDel.clicked())
         {
+            std::cout << elt.second.m_namePicture << std::endl;
             elt.second.m_active = false;
+            elt.second.m_interface->m_select.set_value(false);
             m_interface->m_main_box.remove_child(elt.second.m_interface->m_top_box);
-            //m_interface->m_tool_box.add_child(elt.second.m_interface->)
+            m_interface->m_tool_box.add_child(elt.second.m_interface->m_label_idx);
+
+            // Check si il y a déja des sommet enlever pour l'affichage dans la tool bar
+            int i(0);
+            for (auto &elt2 : m_vertices)
+            {
+                if(!elt2.second.m_active)
+                    i=i+3;
+            }
+
+            elt.second.m_interface->m_label_idx.set_pos(toolX,toolY*i);
+            elt.second.m_interface->m_label_idx.set_message(elt.second.m_namePicture);
+            m_interface->m_tool_box.add_child(elt.second.m_interface->m_select2);
+            elt.second.m_interface->m_select2.set_dim(10,10);
+            elt.second.m_interface->m_select2.set_pos(toolX-15,toolY*i);
+            elt.second.m_interface->m_select2.set_value(false);
         }
 
-        if(elt.second.m_interface->m_select.get_value() && m_interface->m_buttonAdd.clicked())
+
+        // Fonction permettant de : - Detruit l'interface du sommet dans la TOOLBOX
+        //                          - Cree l'interface du sommet sur la main BOX
+        if(elt.second.m_interface->m_select2.get_value() && m_interface->m_buttonAdd.clicked())
         {
             elt.second.m_active = true;
+            elt.second.m_interface->m_select2.set_value(false);
+            m_interface->m_tool_box.remove_child(elt.second.m_interface->m_label_idx);
+            m_interface->m_tool_box.remove_child(elt.second.m_interface->m_select2);
             add_interfaced_vertex(elt.first,elt.second.m_value,elt.second.m_pos_x,elt.second.m_pos_y,elt.second.m_namePicture,0,elt.second.m_growth);
         }
+
+        // Permet d'init en permanence les slider de chaque sommet
+        if(elt.second.m_interface->m_select.get_value() && m_interface->m_selectSlider.get_value())
+            elt.second.m_value= m_interface->m_slider.get_value();
+
+        elt.second.pre_update();
     }
 
 
     for (auto &elt : m_edges)
     {
+        // MAJ des poids des aretes
         elt.second.m_weight = m_vertices[elt.second.m_to].m_hunger * m_vertices[elt.second.m_to].m_value;
         if (elt.second.m_weight > 100)
             elt.second.m_weight = 100;
+
         elt.second.pre_update();
+
+        // On enleve les aretes des sommets DELETED
+        if( (!m_vertices[elt.second.m_from].m_active || !m_vertices[elt.second.m_to].m_active) && elt.second.m_active)
+        {
+            elt.second.m_active = false;
+            m_interface->m_main_box.remove_child(elt.second.m_interface->m_top_edge);
+        }
+        if( (m_vertices[elt.second.m_from].m_active && m_vertices[elt.second.m_to].m_active) && !elt.second.m_active)
+        {
+            elt.second.m_active = true;
+            add_interfaced_edge(elt.first,elt.second.m_from,elt.second.m_to,elt.second.m_weight);
+        }
     }
+
+
 
     m_interface->m_top_box.update();
 
@@ -305,7 +346,7 @@ void Graph::update()
     {
         if (elt.second.m_active)
         {
-            m_interface->m_test_text.set_message(std::to_string((int)m_interface->m_slider_select.get_value()));
+            m_interface->m_textSlider.set_message(std::to_string((int)m_interface->m_slider.get_value()));
             elt.second.post_update();
         }
     }
@@ -321,7 +362,7 @@ void Graph::update()
 }
 
 /// Aide à l'ajout de sommets interfacés
-void Graph::add_interfaced_vertex(int idx, double value, int x, int y, std::string pic_name, int pic_idx, int growthcolor)
+void Graph::add_interfaced_vertex(int idx, double value, int x, int y, std::string pic_name, int pic_idx, int growthcolor, bool active)
 
 {
 //    if ( m_vertices.find(idx)!=m_vertices.end() )
@@ -378,15 +419,14 @@ void Graph::make_example()
     {
         add_interfaced_vertex(it->first, it->second.m_value, it->second.m_pos_x, it->second.m_pos_y, it->second.m_namePicture,0,it->second.m_growth);
     }
-    /// Les sommets doivent être définis avant les arcs
-    // Ajouter le sommet d'indice 0 de valeur 30 en x=200 et y=100 avec l'image clown1.jpg etc...
 
     /// Les arcs doivent être définis entre des sommets qui existent !
     // AJouter l'arc d'indice 0, allant du sommet 1 au sommet 2 de poids 50 etc...
 
     for(std::map<int, Edge>::iterator it(m_edges.begin()); it!=m_edges.end(); ++it)
     {
-        add_interfaced_edge(it->first, it->second.m_from, it->second.m_to, it->second.m_weight);
+        if(it->second.m_active)
+            add_interfaced_edge(it->first, it->second.m_from, it->second.m_to, it->second.m_weight);
     }
 }
 
@@ -400,6 +440,21 @@ void Graph::initTabAdja()
         for(int z=0; z<m_ordre; z++)
         {
             m_adjacensePoids[w].push_back(0);
+        }
+    }
+
+    for(std::map<int, Vertex>::iterator it = m_vertices.begin(); it != m_vertices.end(); ++it)
+    {
+        for(std::map<int, Edge>::iterator it2 = m_edges.begin(); it2 != m_edges.end(); ++it2)
+        {
+            if(it2->second.m_from == it->first)
+            {
+                it->second.m_out.push_back(it2->second.m_to);
+            }
+            if(it2->second.m_to== it->first)
+            {
+                it->second.m_in.push_back(it2->second.m_from);
+            }
         }
     }
 
@@ -510,6 +565,7 @@ void Graph::save_graph(std::string nom_fichier)
             fc << it->second.m_pos_y << " ";
             fc << it->second.m_value << " ";
             fc << it->second.m_hunger << " ";
+            fc << it->second.m_active << " ";
         }
     }
 
