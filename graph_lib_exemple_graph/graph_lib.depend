@@ -1,30 +1,31 @@
 # depslib dependency file v1.0
-1522575069 source:c:\users\ldevincre\desktop\ing2\projet_theorie_graphe\graph_lib_v1\graph_lib_exemple_graph\grman\coords.cpp
+1522917502 source:c:\users\ldevincre\desktop\ing2\projet_theorie_graphe\graph_lib_v1\graph_lib_exemple_graph\grman\coords.cpp
 	"coords.h"
 
-1522575424 c:\users\ldevincre\desktop\ing2\projet_theorie_graphe\graph_lib_v1\graph_lib_exemple_graph\grman\coords.h
+1522917502 c:\users\ldevincre\desktop\ing2\projet_theorie_graphe\graph_lib_v1\graph_lib_exemple_graph\grman\coords.h
 	<cmath>
 
-1522779999 source:c:\users\ldevincre\desktop\ing2\projet_theorie_graphe\graph_lib_v1\graph_lib_exemple_graph\graph.cpp
+1522923363 source:c:\users\ldevincre\desktop\ing2\projet_theorie_graphe\graph_lib_v1\graph_lib_exemple_graph\graph.cpp
 	"graph.h"
 
-1522780767 c:\users\ldevincre\desktop\ing2\projet_theorie_graphe\graph_lib_v1\graph_lib_exemple_graph\graph.h
+1522920430 c:\users\ldevincre\desktop\ing2\projet_theorie_graphe\graph_lib_v1\graph_lib_exemple_graph\graph.h
 	<vector>
 	<map>
 	<string>
 	<memory>
+	<fstream>
 	"grman/grman.h"
 
-1522539041 c:\users\ldevincre\desktop\ing2\projet_theorie_graphe\graph_lib_v1\graph_lib_exemple_graph\grman\grman.h
+1522917502 c:\users\ldevincre\desktop\ing2\projet_theorie_graphe\graph_lib_v1\graph_lib_exemple_graph\grman\grman.h
 	<allegro.h>
 	<string>
 	"grman_couleurs.h"
 	"coords.h"
 	"widget.h"
 
-1509222372 c:\users\ldevincre\desktop\ing2\projet_theorie_graphe\graph_lib_v1\graph_lib_exemple_graph\grman\grman_couleurs.h
+1522917502 c:\users\ldevincre\desktop\ing2\projet_theorie_graphe\graph_lib_v1\graph_lib_exemple_graph\grman\grman_couleurs.h
 
-1522767049 c:\users\ldevincre\desktop\ing2\projet_theorie_graphe\graph_lib_v1\graph_lib_exemple_graph\grman\widget.h
+1522917502 c:\users\ldevincre\desktop\ing2\projet_theorie_graphe\graph_lib_v1\graph_lib_exemple_graph\grman\widget.h
 	"grman.h"
 	<iostream>
 	<string>
@@ -32,7 +33,7 @@
 	<algorithm>
 	<allegro.h>
 
-1522515823 source:c:\users\ldevincre\desktop\ing2\projet_theorie_graphe\graph_lib_v1\graph_lib_exemple_graph\grman\grman.cpp
+1522917502 source:c:\users\ldevincre\desktop\ing2\projet_theorie_graphe\graph_lib_v1\graph_lib_exemple_graph\grman\grman.cpp
 	<cmath>
 	<unordered_map>
 	<unordered_set>
@@ -46,10 +47,10 @@
 	<loadpng.h>
 	<jpgalleg.h>
 
-1522636919 source:c:\users\ldevincre\desktop\ing2\projet_theorie_graphe\graph_lib_v1\graph_lib_exemple_graph\grman\widget.cpp
+1522917502 source:c:\users\ldevincre\desktop\ing2\projet_theorie_graphe\graph_lib_v1\graph_lib_exemple_graph\grman\widget.cpp
 	"widget.h"
 
-1522779231 source:c:\users\ldevincre\desktop\ing2\projet_theorie_graphe\graph_lib_v1\graph_lib_exemple_graph\main.cpp
+1522917502 source:c:\users\ldevincre\desktop\ing2\projet_theorie_graphe\graph_lib_v1\graph_lib_exemple_graph\main.cpp
 	"grman/grman.h"
 	<iostream>
 	"graph.h"

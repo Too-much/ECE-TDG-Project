@@ -325,6 +325,13 @@ class GraphInterface
         /// Dans cette boite seront ajoutés des boutons de contrôle etc...
         grman::WidgetBox m_tool_box;
 
+        // Un label de visualisation de la valeur du sommet
+        grman::WidgetText m_test_text;
+
+        // Boite à outil dans la toolbox
+        grman::WidgetBox m_boite_outil;
+        grman::WidgetVSlider m_slider_select;
+
 
         // A compléter éventuellement par des widgets de décoration ou
         // d'édition (boutons ajouter/enlever ...)

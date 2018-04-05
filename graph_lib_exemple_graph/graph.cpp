@@ -24,6 +24,7 @@ VertexInterface::VertexInterface(int idx, int x, int y, std::string pic_name, in
     m_top_box.set_dim(130, 100); // Change la taille des box des SOMMETS
     m_top_box.set_moveable();
 
+
     // Le slider de réglage de valeur
     m_top_box.add_child( m_slider_value );
     m_slider_value.set_range(0.0, 100.0);  // CHANGE LA RANGE DES SLIDERS DES SOMMETS
@@ -176,6 +177,8 @@ void Edge::pre_update()
 
     /// Copier la valeur locale de la donnée m_weight vers le label sous le slider
     m_interface->m_label_weight.set_message( std::to_string( (int)m_weight ) );
+
+
 }
 
 /// Gestion du Edge après l'appel à l'interface
@@ -206,6 +209,22 @@ GraphInterface::GraphInterface(int x, int y, int w, int h)
     m_tool_box.set_gravity_xy(grman::GravityX::Left, grman::GravityY::Up);
     m_tool_box.set_bg_color(BLANCBLEU);
 
+    m_tool_box.add_child(m_boite_outil);
+    m_boite_outil.set_dim(50,200);          //on crée une seconde boite dans la toolbox
+    m_boite_outil.set_gravity_xy(grman::GravityX::Center, grman::GravityY::Center);
+    m_boite_outil.set_bg_color(JAUNESOMBRE);
+    m_boite_outil.set_moveable();
+    m_boite_outil.add_child(m_slider_select);   //on crée un slider dans la dans la seconde boite qui est dans la toolbox
+    m_slider_select.set_range(0.0, 100.0);
+    m_slider_select.set_dim(16,40);
+    m_slider_select.set_gravity_y(grman::GravityY::Center);
+
+    // Label de visualisation de valeur de slider select
+    m_boite_outil.add_child( m_test_text );
+    m_test_text.set_gravity_y(grman::GravityY::Down);
+    m_test_text.set_message(std::to_string(m_slider_select.get_value()));
+
+
     m_top_box.add_child(m_main_box);
     m_main_box.set_dim(908,720);
     m_main_box.set_gravity_xy(grman::GravityX::Right, grman::GravityY::Up);
@@ -214,6 +233,90 @@ GraphInterface::GraphInterface(int x, int y, int w, int h)
     // m_main_box.set_bg_color(BLANCJAUNE);
 }
 
+
+/// La méthode update à appeler dans la boucle de jeu pour les graphes avec interface
+void Graph::update()
+{
+    if (!m_interface)
+        return;
+
+    for (auto &elt : m_vertices)
+    {
+        elt.second.m_value= m_interface->m_slider_select.get_value();
+        elt.second.pre_update();
+    }
+
+
+    for (auto &elt : m_edges)
+    {
+        elt.second.m_weight = m_vertices[elt.second.m_to].m_hunger * m_vertices[elt.second.m_to].m_value;
+        if (elt.second.m_weight > 100)
+            elt.second.m_weight = 100;
+        elt.second.pre_update();
+    }
+
+    m_interface->m_top_box.update();
+
+
+
+    for (auto &elt : m_vertices)
+    {
+        m_interface->m_test_text.set_message(std::to_string((int)m_interface->m_slider_select.get_value()));
+        elt.second.post_update();
+    }
+
+
+    for (auto &elt : m_edges)
+    {
+        elt.second.post_update();
+    }
+
+
+
+}
+
+/// Aide à l'ajout de sommets interfacés
+void Graph::add_interfaced_vertex(int idx, double value, int x, int y, std::string pic_name, int pic_idx, int growthcolor)
+
+{
+//    if ( m_vertices.find(idx)!=m_vertices.end() )
+//    {
+//        std::cerr << "Error adding vertex at idx=" << idx << " already used..." << std::endl;
+//        throw "Error adding vertex";
+//    }
+
+    // Création d'une interface de sommet
+    VertexInterface *vi = new VertexInterface(idx, x, y, pic_name, pic_idx, growthcolor);
+    // Ajout de la top box de l'interface de sommet
+    m_interface->m_main_box.add_child(vi->m_top_box);
+    m_vertices[idx].m_interface = vi;
+
+    // On peut ajouter directement des vertices dans la map avec la notation crochet :
+    ///m_vertices[idx] = Vertex(value,vi);
+}
+
+/// Aide à l'ajout d'arcs interfacés
+void Graph::add_interfaced_edge(int idx, int id_vert1, int id_vert2, double weight)
+{
+//    if ( m_edges.find(idx)!=m_edges.end() )
+//    {
+//        std::cerr << "Error adding edge at idx=" << idx << " already used..." << std::endl;
+//        throw "Error adding edge";
+//    }
+//
+//    if ( m_vertices.find(id_vert1)==m_vertices.end() || m_vertices.find(id_vert2)==m_vertices.end() )
+//    {
+//        std::cerr << "Error adding edge idx=" << idx << " between vertices " << id_vert1 << " and " << id_vert2 << " not in m_vertices" << std::endl;
+//        throw "Error adding edge";
+//    }
+
+    // Création d'une interface d'arete
+    EdgeInterface *ei = new EdgeInterface(m_vertices[id_vert1], m_vertices[id_vert2], weight);
+    // Ajout de la top box de l'interface de l'arete
+    m_interface->m_main_box.add_child(ei->m_top_edge);
+    m_edges[idx].m_interface = ei;
+    //m_edges[idx] = Edge(weight, ei);
+}
 
 /// Méthode spéciale qui construit un graphe arbitraire (démo)
 /// Cette méthode est à enlever et remplacer par un système
@@ -241,6 +344,7 @@ void Graph::make_example()
         add_interfaced_edge(it->first, it->second.m_from, it->second.m_to, it->second.m_weight);
     }
 }
+
 
 void Graph::initTabAdja()
 {
@@ -369,74 +473,3 @@ void Graph::save_graph(std::string nom_fichier)
         std::cout << "Error lors du chargement du fichier !" << std::endl;
     }
 }
-
-/// La méthode update à appeler dans la boucle de jeu pour les graphes avec interface
-void Graph::update()
-{
-    if (!m_interface)
-        return;
-
-    for (auto &elt : m_vertices)
-        elt.second.pre_update();
-
-    for (auto &elt : m_edges)
-    {
-        elt.second.m_weight = m_vertices[elt.second.m_to].m_hunger * m_vertices[elt.second.m_to].m_value;
-        if (elt.second.m_weight > 100)
-            elt.second.m_weight = 100;
-        elt.second.pre_update();
-    }
-
-    m_interface->m_top_box.update();
-
-    for (auto &elt : m_vertices)
-        elt.second.post_update();
-
-    for (auto &elt : m_edges)
-        elt.second.post_update();
-
-}
-
-/// Aide à l'ajout de sommets interfacés
-void Graph::add_interfaced_vertex(int idx, double value, int x, int y, std::string pic_name, int pic_idx, int growthcolor)
-
-{
-//    if ( m_vertices.find(idx)!=m_vertices.end() )
-//    {
-//        std::cerr << "Error adding vertex at idx=" << idx << " already used..." << std::endl;
-//        throw "Error adding vertex";
-//    }
-
-    // Création d'une interface de sommet
-    VertexInterface *vi = new VertexInterface(idx, x, y, pic_name, pic_idx, growthcolor);
-    // Ajout de la top box de l'interface de sommet
-    m_interface->m_main_box.add_child(vi->m_top_box);
-    m_vertices[idx].m_interface = vi;
-
-    // On peut ajouter directement des vertices dans la map avec la notation crochet :
-    ///m_vertices[idx] = Vertex(value,vi);
-}
-
-/// Aide à l'ajout d'arcs interfacés
-void Graph::add_interfaced_edge(int idx, int id_vert1, int id_vert2, double weight)
-{
-//    if ( m_edges.find(idx)!=m_edges.end() )
-//    {
-//        std::cerr << "Error adding edge at idx=" << idx << " already used..." << std::endl;
-//        throw "Error adding edge";
-//    }
-//
-//    if ( m_vertices.find(id_vert1)==m_vertices.end() || m_vertices.find(id_vert2)==m_vertices.end() )
-//    {
-//        std::cerr << "Error adding edge idx=" << idx << " between vertices " << id_vert1 << " and " << id_vert2 << " not in m_vertices" << std::endl;
-//        throw "Error adding edge";
-//    }
-
-    // Création d'une interface d'arete
-    EdgeInterface *ei = new EdgeInterface(m_vertices[id_vert1], m_vertices[id_vert2], weight);
-    // Ajout de la top box de l'interface de l'arete
-    m_interface->m_main_box.add_child(ei->m_top_edge);
-    m_edges[idx].m_interface = ei;
-    //m_edges[idx] = Edge(weight, ei);
-}
-
