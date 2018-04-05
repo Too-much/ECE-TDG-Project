@@ -238,7 +238,7 @@ GraphInterface::GraphInterface(int x, int y, int w, int h)
     m_tool_box.add_child(m_buttonDel);
     m_buttonDel.set_dim(35,30);
     m_buttonDel.set_gravity_xy(grman::GravityX::Left, grman::GravityY::Center);
-    m_buttonDel.set_bg_color(BLANC);
+    m_buttonDel.set_bg_color(ROUGE);
     m_buttonDel.add_child(m_buttonDel_label);
     m_buttonDel_label.set_message("DEL");
 
@@ -246,7 +246,7 @@ GraphInterface::GraphInterface(int x, int y, int w, int h)
     m_tool_box.add_child(m_buttonAdd);
     m_buttonAdd.set_dim(35,30);
     m_buttonAdd.set_gravity_xy(grman::GravityX::Right, grman::GravityY::Center);
-    m_buttonAdd.set_bg_color(BLANC);
+    m_buttonAdd.set_bg_color(VERT);
     m_buttonAdd.add_child(m_buttonAdd_label);
     m_buttonAdd_label.set_message("ADD");
 
@@ -254,16 +254,35 @@ GraphInterface::GraphInterface(int x, int y, int w, int h)
     m_top_box.add_child(m_main_box);
     m_main_box.set_dim(908,720);
     m_main_box.set_gravity_xy(grman::GravityX::Right, grman::GravityY::Up);
-    m_img.set_pic_name("coupe_paysage.jpg");
     m_main_box.add_child(m_img);
-    // m_main_box.set_bg_color(BLANCJAUNE);
+    m_img.set_pic_name("coupe_paysage.jpg");
+}
+
+/// Methode permettant de calculer en temps reel la quantité de consommation d'un individu par rapport à ses adjacents
+void Graph::init_consumption_Vertices()
+{
+    for(std::map<int, Vertex>::iterator it(m_vertices.begin()); it!=m_vertices.end(); ++it)
+    {
+        float k_sommet(0);
+        for(std::map<int, Vertex>::iterator it2(m_vertices.begin()); it2!=m_vertices.end(); ++it2)
+        {
+            for(unsigned int i(0); i<it->second.m_out.size(); ++i)
+            {
+                if(it2->first == it->second.m_out[i])
+                {
+                    k_sommet = k_sommet + ( (it->second.m_hunger/it->second.m_out.size()) * it2->second.m_value);
+                }
+            }
+        }
+        it->second.m_consumption = k_sommet;
+    }
 }
 
 void Graph::deleteVertex(int i)
 {
     // Fonction permettant de : - DELETE un sommet
-        //                          - Detruire l'interface du sommet sur la main BOX
-        //                          - Ajoute le sommet dans la TOOLBOX afin de pouvoir le reADD plus tard
+    //                          - Detruire l'interface du sommet sur la main BOX
+    //                          - Ajoute le sommet dans la TOOLBOX afin de pouvoir le reADD plus tard
     if( (m_vertices[i].m_interface->m_select.get_value() && m_interface->m_buttonDel.clicked())|| m_vertices[i].m_saveSupp)
     {
         int j(0);
@@ -292,7 +311,7 @@ void Graph::deleteVertex(int i)
 void Graph::addVertex(int i)
 {
     // Fonction permettant de : - Detruit l'interface du sommet dans la TOOLBOX
-        //                          - Cree l'interface du sommet sur la main BOX
+    //                          - Cree l'interface du sommet sur la main BOX
     if(m_vertices[i].m_interface->m_select2.get_value() && m_interface->m_buttonAdd.clicked())
     {
         m_vertices[i].m_active = true;
@@ -308,6 +327,8 @@ void Graph::update()
 {
     if (!m_interface)
         return;
+
+    init_consumption_Vertices();
 
     for (auto &elt : m_vertices)
     {
@@ -373,43 +394,22 @@ void Graph::update()
 void Graph::add_interfaced_vertex(int idx, double value, int x, int y, std::string pic_name, int pic_idx, int growthcolor, bool active)
 
 {
-//    if ( m_vertices.find(idx)!=m_vertices.end() )
-//    {
-//        std::cerr << "Error adding vertex at idx=" << idx << " already used..." << std::endl;
-//        throw "Error adding vertex";
-//    }
-
     // Création d'une interface de sommet
     VertexInterface *vi = new VertexInterface(idx, x, y, pic_name, pic_idx, growthcolor);
     // Ajout de la top box de l'interface de sommet
     m_interface->m_main_box.add_child(vi->m_top_box);
     m_vertices[idx].m_interface = vi;
 
-    // On peut ajouter directement des vertices dans la map avec la notation crochet :
-    ///m_vertices[idx] = Vertex(value,vi);
 }
 
 /// Aide à l'ajout d'arcs interfacés
 void Graph::add_interfaced_edge(int idx, int id_vert1, int id_vert2, double weight)
 {
-//    if ( m_edges.find(idx)!=m_edges.end() )
-//    {
-//        std::cerr << "Error adding edge at idx=" << idx << " already used..." << std::endl;
-//        throw "Error adding edge";
-//    }
-//
-//    if ( m_vertices.find(id_vert1)==m_vertices.end() || m_vertices.find(id_vert2)==m_vertices.end() )
-//    {
-//        std::cerr << "Error adding edge idx=" << idx << " between vertices " << id_vert1 << " and " << id_vert2 << " not in m_vertices" << std::endl;
-//        throw "Error adding edge";
-//    }
-
     // Création d'une interface d'arete
     EdgeInterface *ei = new EdgeInterface(m_vertices[id_vert1], m_vertices[id_vert2], weight);
     // Ajout de la top box de l'interface de l'arete
     m_interface->m_main_box.add_child(ei->m_top_edge);
     m_edges[idx].m_interface = ei;
-    //m_edges[idx] = Edge(weight, ei);
 }
 
 /// Méthode spéciale qui construit un graphe arbitraire (démo)

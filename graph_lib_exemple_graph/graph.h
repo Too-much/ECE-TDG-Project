@@ -91,39 +91,39 @@ class VertexInterface
     friend class EdgeInterface;
     friend class Graph;
 
-    private :
+private :
 
-        /// Les widgets de l'interface. N'oubliez pas qu'il ne suffit pas de déclarer
-        /// ici un widget pour qu'il apparaisse, il faut aussi le mettre en place et
-        /// le paramétrer ( voir l'implémentation du constructeur dans le .cpp )
+    /// Les widgets de l'interface. N'oubliez pas qu'il ne suffit pas de déclarer
+    /// ici un widget pour qu'il apparaisse, il faut aussi le mettre en place et
+    /// le paramétrer ( voir l'implémentation du constructeur dans le .cpp )
 
-        // La boite qui contient toute l'interface d'un sommet
-        grman::WidgetBox m_top_box;
+    // La boite qui contient toute l'interface d'un sommet
+    grman::WidgetBox m_top_box;
 
-        // Un slider de visualisation/modification de la valeur du sommet
-        grman::WidgetVSlider m_slider_value;
+    // Un slider de visualisation/modification de la valeur du sommet
+    grman::WidgetVSlider m_slider_value;
 
-        // Un label de visualisation de la valeur du sommet
-        grman::WidgetText m_label_value;
+    // Un label de visualisation de la valeur du sommet
+    grman::WidgetText m_label_value;
 
-        // Une image de "remplissage"
-        grman::WidgetImage m_img;
+    // Une image de "remplissage"
+    grman::WidgetImage m_img;
 
-        // Un label indiquant l'index du sommet
-        grman::WidgetText m_label_idx;
+    // Un label indiquant l'index du sommet
+    grman::WidgetText m_label_idx;
 
-        // Une boite pour le label précédent
-        grman::WidgetText m_box_label_idx;
+    // Une boite pour le label précédent
+    grman::WidgetText m_box_label_idx;
 
-        //Creation du bouton select de chaque sommet
-        grman::WidgetCheckBox m_select;
-        grman::WidgetCheckBox m_select2;
+    //Creation du bouton select de chaque sommet
+    grman::WidgetCheckBox m_select;
+    grman::WidgetCheckBox m_select2;
 
-    public :
+public :
 
-        // Le constructeur met en place les éléments de l'interface
-        // voir l'implémentation dans le .cpp
-        VertexInterface(int idx, int x, int y, std::string pic_name="", int pic_idx=0,int growth=0, bool active=0);
+    // Le constructeur met en place les éléments de l'interface
+    // voir l'implémentation dans le .cpp
+    VertexInterface(int idx, int x, int y, std::string pic_name="", int pic_idx=0,int growth=0, bool active=0);
 };
 
 
@@ -136,75 +136,75 @@ class Vertex
     friend class Edge;
     friend class EdgeInterface;
 
-    private :
-        /// liste des indices des arcs arrivant au sommet : accès aux prédécesseurs
-        std::vector<int> m_in;
+private :
+    /// liste des indices des arcs arrivant au sommet : accès aux prédécesseurs
+    std::vector<int> m_in;
 
-        /// liste des indices des arcs partant du sommet : accès aux successeurs
-        std::vector<int> m_out;
+    /// liste des indices des arcs partant du sommet : accès aux successeurs
+    std::vector<int> m_out;
 
-        /// un exemple de donnée associée à l'arc, on peut en ajouter d'autres...
-        double m_value;
+    /// un exemple de donnée associée à l'arc, on peut en ajouter d'autres...
+    double m_value;
 
-        bool m_marque;
+    bool m_marque;
 
-        ///ce que l'espece consomme (qté de ressource environnementale ou d'animaux prédatés)
-        float m_consumption;
+    ///ce que l'espece consomme (qté de ressource environnementale ou d'animaux prédatés)
+    float m_consumption;
 
-        ///le ryhtme de croissance de l'espece
-        float m_growth;
+    ///le ryhtme de croissance de l'espece
+    float m_growth;
 
-        ///place que prend une espece dans un environnement (pour une capacite de portage de son environnement = à 100)
-        int m_usedSpace;
+    ///place que prend une espece dans un environnement (pour une capacite de portage de son environnement = à 100)
+    int m_usedSpace;
 
-        ///ce que l'espece "produit" : waste (+ ressources env pour les plantes)
-        float m_waste;
+    ///ce que l'espece "produit" : waste (+ ressources env pour les plantes)
+    float m_waste;
 
-        /// Nom du sommet
-        std::string m_name;
+    /// Nom du sommet
+    std::string m_name;
 
-        /// Nom de l'image associée
-        std::string m_namePicture;
+    /// Nom de l'image associée
+    std::string m_namePicture;
 
-        /// Position en x et y
-        int m_pos_x;
-        int m_pos_y;
+    /// Position en x et y
+    int m_pos_x;
+    int m_pos_y;
 
-        ///faim
-        float m_hunger;
+    ///faim
+    float m_hunger;
 
-        /// Si on supprime le sommet ou non
-        bool m_active = true;
-        // Bool pour faire fonctionner la sauvegarde des sommets supp
-        bool m_saveSupp;
+    /// Si on supprime le sommet ou non
+    bool m_active = true;
+    /// Bool pour faire fonctionner la sauvegarde des sommets supp
+    bool m_saveSupp;
 
-        /// le POINTEUR sur l'interface associée, nullptr -> pas d'interface
-        //std::shared_ptr<VertexInterface> m_interface = nullptr;
-        VertexInterface * m_interface = nullptr;
-
-
-        // Docu shared_ptr : https://msdn.microsoft.com/fr-fr/library/hh279669.aspx
-        // La ligne précédente est en gros équivalent à la ligne suivante :
-        // VertexInterface * m_interface = nullptr;
+    /// le POINTEUR sur l'interface associée, nullptr -> pas d'interface
+    //std::shared_ptr<VertexInterface> m_interface = nullptr;
+    VertexInterface * m_interface = nullptr;
 
 
-    public:
-
-        /// Les constructeurs sont à compléter selon vos besoin...
-
-        /// Constructor par defaut
-        Vertex(std::ifstream& fc);
-
-        /// Ici on ne donne qu'un seul constructeur qui peut utiliser une interface
-        Vertex (double value=0, VertexInterface *interface=nullptr) :
-            m_value(value), m_interface(interface)  {  }
+    // Docu shared_ptr : https://msdn.microsoft.com/fr-fr/library/hh279669.aspx
+    // La ligne précédente est en gros équivalent à la ligne suivante :
+    // VertexInterface * m_interface = nullptr;
 
 
-        /// Vertex étant géré par Graph ce sera la méthode update de graph qui appellera
-        /// le pre_update et post_update de Vertex (pas directement la boucle de jeu)
-        /// Voir l'implémentation Graph::update dans le .cpp
-        void pre_update();
-        void post_update();
+public:
+
+    /// Les constructeurs sont à compléter selon vos besoin...
+
+    /// Constructor par defaut
+    Vertex(std::ifstream& fc);
+
+    /// Ici on ne donne qu'un seul constructeur qui peut utiliser une interface
+    Vertex (double value=0, VertexInterface *interface=nullptr) :
+        m_value(value), m_interface(interface)  {  }
+
+
+    /// Vertex étant géré par Graph ce sera la méthode update de graph qui appellera
+    /// le pre_update et post_update de Vertex (pas directement la boucle de jeu)
+    /// Voir l'implémentation Graph::update dans le .cpp
+    void pre_update();
+    void post_update();
 };
 
 
@@ -220,29 +220,29 @@ class EdgeInterface
     friend class Edge;
     friend class Graph;
 
-    private :
+private :
 
-        /// Les widgets de l'interface. N'oubliez pas qu'il ne suffit pas de déclarer
-        /// ici un widget pour qu'il apparaisse, il faut aussi le mettre en place et
-        /// le paramétrer ( voir l'implémentation du constructeur dans le .cpp )
+    /// Les widgets de l'interface. N'oubliez pas qu'il ne suffit pas de déclarer
+    /// ici un widget pour qu'il apparaisse, il faut aussi le mettre en place et
+    /// le paramétrer ( voir l'implémentation du constructeur dans le .cpp )
 
-        // Le WidgetEdge qui "contient" toute l'interface d'un arc
-        grman::WidgetEdge m_top_edge;
+    // Le WidgetEdge qui "contient" toute l'interface d'un arc
+    grman::WidgetEdge m_top_edge;
 
-        // Une boite pour englober les widgets de réglage associés
-        grman::WidgetBox m_box_edge;
+    // Une boite pour englober les widgets de réglage associés
+    grman::WidgetBox m_box_edge;
 
-        // Un slider de visualisation/modification du poids valeur de l'arc
-        grman::WidgetVSlider m_slider_weight;
+    // Un slider de visualisation/modification du poids valeur de l'arc
+    grman::WidgetVSlider m_slider_weight;
 
-        // Un label de visualisation du poids de l'arc
-        grman::WidgetText m_label_weight;
+    // Un label de visualisation du poids de l'arc
+    grman::WidgetText m_label_weight;
 
-    public :
+public :
 
-        // Le constructeur met en place les éléments de l'interface
-        // voir l'implémentation dans le .cpp
-        EdgeInterface(Vertex& from, Vertex& to, double weight=0);
+    // Le constructeur met en place les éléments de l'interface
+    // voir l'implémentation dans le .cpp
+    EdgeInterface(Vertex& from, Vertex& to, double weight=0);
 };
 
 
@@ -253,51 +253,69 @@ class Edge
     friend class Graph;
     friend class EdgeInterface;
 
-    private :
-        /// indice du sommet de départ de l'arc
-        int m_from;
+private :
+    /// indice du sommet de départ de l'arc
+    int m_from;
 
-        /// indice du sommet d'arrivée de l'arc
-        int m_to;
+    /// indice du sommet d'arrivée de l'arc
+    int m_to;
 
-        /// un exemple de donnée associée à l'arc, on peut en ajouter d'autres...
-        double m_weight;
+    /// un exemple de donnée associée à l'arc, on peut en ajouter d'autres...
+    double m_weight;
 
-        ///Si supression ou non
-        bool m_active;
+    ///Si supression ou non
+    bool m_active;
 
-        /// le POINTEUR sur l'interface associée, nullptr -> pas d'interface
-        //std::shared_ptr<EdgeInterface> m_interface = nullptr;
-        EdgeInterface * m_interface = nullptr;
-
-
+    /// le POINTEUR sur l'interface associée, nullptr -> pas d'interface
+    //std::shared_ptr<EdgeInterface> m_interface = nullptr;
+    EdgeInterface * m_interface = nullptr;
 
 
-    public:
 
-        /// Les constructeurs sont à compléter selon vos besoin...
 
-        /// Constructor par defaut
-        Edge(std::ifstream& fc);
-        /// Ici on ne donne qu'un seul constructeur qui peut utiliser une interface
-        Edge (double weight=0, EdgeInterface *interface=nullptr) :
-            m_weight(weight), m_interface(interface)  {  }
+public:
 
-        ///getters et setters
-        int get_from(){return m_from;}
-        void set_from(int _from){m_from=_from;}
+    /// Les constructeurs sont à compléter selon vos besoin...
 
-        int get_to(){return m_to;}
-        void set_to(int _to){m_to=_to;}
+    /// Constructor par defaut
+    Edge(std::ifstream& fc);
+    /// Ici on ne donne qu'un seul constructeur qui peut utiliser une interface
+    Edge (double weight=0, EdgeInterface *interface=nullptr) :
+        m_weight(weight), m_interface(interface)  {  }
 
-        double get_weight(){return m_weight;}
-        void set_weight(double _weight){m_weight=_weight;}
+    ///getters et setters
+    int get_from()
+    {
+        return m_from;
+    }
+    void set_from(int _from)
+    {
+        m_from=_from;
+    }
 
-        /// Edge étant géré par Graph ce sera la méthode update de graph qui appellera
-        /// le pre_update et post_update de Edge (pas directement la boucle de jeu)
-        /// Voir l'implémentation Graph::update dans le .cpp
-        void pre_update();
-        void post_update();
+    int get_to()
+    {
+        return m_to;
+    }
+    void set_to(int _to)
+    {
+        m_to=_to;
+    }
+
+    double get_weight()
+    {
+        return m_weight;
+    }
+    void set_weight(double _weight)
+    {
+        m_weight=_weight;
+    }
+
+    /// Edge étant géré par Graph ce sera la méthode update de graph qui appellera
+    /// le pre_update et post_update de Edge (pas directement la boucle de jeu)
+    /// Voir l'implémentation Graph::update dans le .cpp
+    void pre_update();
+    void post_update();
 };
 
 
@@ -311,118 +329,112 @@ class GraphInterface
 {
     friend class Graph;
 
-    private :
+private :
 
 
 
-        /// Les widgets de l'interface. N'oubliez pas qu'il ne suffit pas de déclarer
-        /// ici un widget pour qu'il apparaisse, il faut aussi le mettre en place et
-        /// le paramétrer ( voir l'implémentation du constructeur dans le .cpp )
+    /// Les widgets de l'interface. N'oubliez pas qu'il ne suffit pas de déclarer
+    /// ici un widget pour qu'il apparaisse, il faut aussi le mettre en place et
+    /// le paramétrer ( voir l'implémentation du constructeur dans le .cpp )
 
-        /// La boite qui contient toute l'interface d'un graphe
-        grman::WidgetBox m_top_box;
+    /// La boite qui contient toute l'interface d'un graphe
+    grman::WidgetBox m_top_box;
 
-        /// Une image de "remplissage"
-        grman::WidgetImage m_img;
+    /// Une image de "remplissage"
+    grman::WidgetImage m_img;
 
-        /// Dans cette boite seront ajoutés les (interfaces des) sommets et des arcs...
-        grman::WidgetBox m_main_box;
+    /// Dans cette boite seront ajoutés les (interfaces des) sommets et des arcs...
+    grman::WidgetBox m_main_box;
 
-        /// Dans cette boite seront ajoutés des boutons de contrôle etc...
-        grman::WidgetBox m_tool_box;
+    /// Dans cette boite seront ajoutés des boutons de contrôle etc...
+    grman::WidgetBox m_tool_box;
 
-        // Boite à outil dans la toolbox
-        grman::WidgetVSlider m_slider;
-        grman::WidgetCheckBox m_selectSlider;
-        grman::WidgetText m_textSlider;
+    // Boite à outil dans la toolbox
+    grman::WidgetVSlider m_slider;
+    grman::WidgetCheckBox m_selectSlider;
+    grman::WidgetText m_textSlider;
 
-        // Boite de boutton de supression
-        grman::WidgetButton m_buttonDel;
-        grman::WidgetText m_buttonDel_label;
+    // Boite de boutton de supression
+    grman::WidgetButton m_buttonDel;
+    grman::WidgetText m_buttonDel_label;
 
-        // Boite de button d'ajout de sommet
-        grman::WidgetButton m_buttonAdd;
-        grman::WidgetText m_buttonAdd_label;
+    // Boite de button d'ajout de sommet
+    grman::WidgetButton m_buttonAdd;
+    grman::WidgetText m_buttonAdd_label;
 
 
-        // A compléter éventuellement par des widgets de décoration ou
-        // d'édition (boutons ajouter/enlever ...)
+    // A compléter éventuellement par des widgets de décoration ou
+    // d'édition (boutons ajouter/enlever ...)
 
-    public :
+public :
 
-        // Le constructeur met en place les éléments de l'interface
-        // voir l'implémentation dans le .cpp
-        GraphInterface(int x, int y, int w, int h);
+    // Le constructeur met en place les éléments de l'interface
+    // voir l'implémentation dans le .cpp
+    GraphInterface(int x, int y, int w, int h);
 };
 
 
 class Graph
 {
-    private :
+private :
 
-        /// La "liste" des arêtes
-        std::map<int, Edge> m_edges;
+    /// La "liste" des arêtes
+    std::map<int, Edge> m_edges;
 
-        /// La liste des sommets
-        std::map<int, Vertex> m_vertices;
+    /// La liste des sommets
+    std::map<int, Vertex> m_vertices;
 
-        /// le POINTEUR sur l'interface associée, nullptr -> pas d'interface
-        std::shared_ptr<GraphInterface> m_interface = nullptr;
+    /// le POINTEUR sur l'interface associée, nullptr -> pas d'interface
+    std::shared_ptr<GraphInterface> m_interface = nullptr;
 
-        ///tableau d'adjacense
-        std::vector<std::vector<int>> m_adjacensePoids;
+    ///tableau d'adjacense
+    std::vector<std::vector<int>> m_adjacensePoids;
 
-        ///ordre du graphe
-        int m_ordre;
+    ///ordre du graphe
+    int m_ordre;
 
-        ///nombre d'arrete du graphe
-        int m_nb_arete;
+    ///nombre d'arrete du graphe
+    int m_nb_arete;
 
-        ///capacité de portage (places dispo) de l'environnement
-        int m_capacity;
+    ///capacité de portage (places dispo) de l'environnement
+    int m_capacity;
 
 
-    public:
+public:
 
-        /// Les constructeurs sont à compléter selon vos besoin...
-        /// Ici on ne donne qu'un seul constructeur qui peut utiliser une interface
-        Graph (GraphInterface *interface=nullptr) :
-            m_interface(interface)  {  }
+    /// Les constructeurs sont à compléter selon vos besoin...
+    /// Ici on ne donne qu'un seul constructeur qui peut utiliser une interface
+    Graph (GraphInterface *interface=nullptr) :
+        m_interface(interface)  {  }
 
-        //Getters et setters
-        int get_ordre(){return m_ordre;}
-        void set_ordre(int _ordre){m_ordre=_ordre;}
+    void add_interfaced_vertex(int idx, double value, int x, int y, std::string pic_name="", int pic_idx=0, int growthcolor=0, bool active=0);
 
-        int get_nb_arete(){return m_nb_arete;}
-        void set_nb_arete(int _nb_arete){m_nb_arete=_nb_arete;}
+    void add_interfaced_edge(int idx, int vert1, int vert2, double weight=0);
 
-        int get_capacity(){return m_capacity;}
-        void set_capacity(int _capacity){m_capacity=_capacity;}
+    /// Méthode spéciale qui construit un graphe arbitraire (démo)
+    /// Voir implémentation dans le .cpp
+    /// Cette méthode est à enlever et remplacer par un système
+    /// de chargement de fichiers par exemple.
+    void make_example();
 
-        void add_interfaced_vertex(int idx, double value, int x, int y, std::string pic_name="", int pic_idx=0, int growthcolor=0, bool active=0);
+    /// La méthode update à appeler dans la boucle de jeu pour les graphes avec interface
+    void update();
 
-        void add_interfaced_edge(int idx, int vert1, int vert2, double weight=0);
+    void deleteVertex(int i);
 
-        /// Méthode spéciale qui construit un graphe arbitraire (démo)
-        /// Voir implémentation dans le .cpp
-        /// Cette méthode est à enlever et remplacer par un système
-        /// de chargement de fichiers par exemple.
-        void make_example();
+    void addVertex(int i);
 
-        /// La méthode update à appeler dans la boucle de jeu pour les graphes avec interface
-        void update();
+    /// Spécifie toutes les capacités de portage de chaque individus par rapport à son environnement
+    void init_consumption_Vertices();
 
-        void deleteVertex(int i);
-        void addVertex(int i);
+    ///affichage des maps
+    void initTabAdja();
 
-        ///affichage des maps
-        void initTabAdja();
+    /// Lecture des fichiers du projet
+    void load_graph(std::string nom_fichier);
 
-        /// Lecture des fichiers du projet
-        void load_graph(std::string nom_fichier);
-
-        /// Enregistre les valeurs des Aretes dans le fichier
-        void save_graph(std::string nom_fichier);
+    /// Enregistre les valeurs des Aretes dans le fichier
+    void save_graph(std::string nom_fichier);
 };
 
 
