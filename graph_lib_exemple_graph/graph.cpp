@@ -213,7 +213,7 @@ void Edge::post_update()
 
 
 /***************************************************
-                    GRAPH
+                    GRAPH INIT
 ****************************************************/
 
 /// Ici le constructeur se contente de préparer un cadre d'accueil des
@@ -267,25 +267,87 @@ GraphInterface::GraphInterface(int x, int y, int w, int h)
     m_img.set_pic_name("coupe_paysage.jpg");
 }
 
+
+
+/********************************************************************************************
+
+                            MISE A JOUR DONNEE (POIDS, CONSOMMATION, POPULATION
+
+*********************************************************************************************/
+
+
+
+
 /// Methode permettant de calculer en temps reel la quantité de consommation d'un individu par rapport à ses adjacents
 void Graph::init_consumption_Vertices()
 {
     for(std::map<int, Vertex>::iterator it(m_vertices.begin()); it!=m_vertices.end(); ++it)
     {
+        //le k du mangeur
         float k_sommet(0);
-        for(std::map<int, Vertex>::iterator it2(m_vertices.begin()); it2!=m_vertices.end(); ++it2)
-        {
+
             for(unsigned int i(0); i<it->second.m_out.size(); ++i)
+            {
+                for(std::map<int, Edge>::iterator it2(m_edges.begin()); it2!=m_edges.end(); ++it2)
+                {
+                    //si on retrouve le sommet it2 dans les successeurs de it + arete corespondante
+                    if(it->first == it2->second.m_from)
+                    {
+                        //k_sommet = k_sommet + ( (it->second.m_hunger/it->second.m_out.size()) * it2->second.m_value);
+                        k_sommet = k_sommet + (it2->second.m_weight*m_vertices[it2->second.m_to].m_value);
+                    }
+                }
+            }
+            it->second.m_consumption = k_sommet;
+            //std::cout<<"le k du sommet : "<<it->first<<" est "<<it->second.m_consumption<<std::endl<<std::endl;
+
+    }
+}
+
+///mise à jour des pop de chaques sommets en fonction des influences respectives
+/*void Graph::evolution()
+{
+    ///pour chaque sommet
+    for(std::map<int, Vertex>::iterator it(m_vertices.begin()); it!=m_vertices.end(); ++it)
+    {
+        ///le quotient population/capacité de portage
+        int rapport_n_k = it->second.m_value/it->second.m_consumption;
+
+        std::cout << it->first << " K = " << it->second.m_consumption << std::endl;
+
+        ///N=n*[1+r*n*(1-n/K)] avec N = nbre à t+1 et n = nbre à t
+        it->second.m_value=it->second.m_value*(1+it->second.m_growth*(1-rapport_n_k));
+
+        for(unsigned int i=0; i<it->second.m_out.size(); i++)
+        {
+            for(std::map<int, Vertex>::iterator it2(m_vertices.begin()); it2!=m_vertices.end(); ++it2)
             {
                 if(it2->first == it->second.m_out[i])
                 {
-                    k_sommet = k_sommet + ( (it->second.m_hunger/it->second.m_out.size()) * it2->second.m_value);
+                    ///regulation de la population en fonction des prédateurs
+                    it->second.m_value-=m_vertices[it->second.m_out[i]].m_value*it2->second.m_value;
+                    std::cout << it->first << "Pop = " << it->second.m_value << std::endl;
                 }
             }
         }
-        it->second.m_consumption = k_sommet;
     }
-}
+
+}*/
+
+
+
+
+
+/********************************************************************************************
+
+                            SOUS FONCTION ADD AND DELETE VERTEX ET EDGE
+
+*********************************************************************************************/
+
+
+
+
+
 
 void Graph::deleteVertex(int i)
 {
@@ -319,7 +381,7 @@ void Graph::addVertex(int i)
     //                          - Cree l'interface du sommet sur la main BOX
     if(m_vertices[i].m_interface->m_select2.get_value() && m_interface->m_buttonAdd.clicked())
     {
-        for (int j(0); j<tab.size();++j)
+        for (unsigned int j(0); j<tab.size();++j)
             if(tab[j]==i)
                 tab.erase(tab.begin()+j);
 
@@ -398,6 +460,17 @@ void Graph::addEdges(int i)
     }
 }
 
+
+
+/********************************************************************************************
+
+                            GRAPHE UPDATE
+
+*********************************************************************************************/
+
+
+
+
 /// La méthode update à appeler dans la boucle de jeu pour les graphes avec interface
 void Graph::update()
 {
@@ -405,6 +478,8 @@ void Graph::update()
         return;
 
     init_consumption_Vertices();
+
+    //evolution();
 
     for (auto &elt : m_vertices)
     {
@@ -449,6 +524,18 @@ void Graph::update()
     }
 }
 
+
+
+
+
+/********************************************************************************************
+
+                            ADD INTERFACE + MAKE EXEMPLE
+
+*********************************************************************************************/
+
+
+
 /// Aide à l'ajout de sommets interfacés
 void Graph::add_interfaced_vertex(int idx, double value, int x, int y, std::string pic_name, int pic_idx, int growthcolor, bool active)
 
@@ -492,10 +579,23 @@ void Graph::make_example()
 
     for(std::map<int, Edge>::iterator it(m_edges.begin()); it!=m_edges.end(); ++it)
     {
-        //if(it->second.m_active || it->second.m_active2)
-            add_interfaced_edge(it->first, it->second.m_from, it->second.m_to, it->second.m_weight);
+        add_interfaced_edge(it->first, it->second.m_from, it->second.m_to, it->second.m_weight);
     }
 }
+
+
+
+
+
+
+
+/********************************************************************************************
+
+                            TABLEAU D'ADJACENCE
+
+*********************************************************************************************/
+
+
 
 
 void Graph::initTabAdja()
@@ -562,9 +662,11 @@ void Graph::initTabAdja()
 
 
 
+/********************************************************************************************
 
+                            TELECHARGEMENT + SAUVEGARDE
 
-
+*********************************************************************************************/
 
 // Methode de telechargement des données depuis un fichier
 void Graph::load_graph(std::string nom_fichier)

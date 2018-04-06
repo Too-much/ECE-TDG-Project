@@ -292,34 +292,6 @@ public:
     Edge(int from, int to, double weight) :
         m_from(from), m_to(to), m_weight(weight){}
 
-    ///getters et setters
-    int get_from()
-    {
-        return m_from;
-    }
-    void set_from(int _from)
-    {
-        m_from=_from;
-    }
-
-    int get_to()
-    {
-        return m_to;
-    }
-    void set_to(int _to)
-    {
-        m_to=_to;
-    }
-
-    double get_weight()
-    {
-        return m_weight;
-    }
-    void set_weight(double _weight)
-    {
-        m_weight=_weight;
-    }
-
     /// Edge étant géré par Graph ce sera la méthode update de graph qui appellera
     /// le pre_update et post_update de Edge (pas directement la boucle de jeu)
     /// Voir l'implémentation Graph::update dans le .cpp
@@ -430,16 +402,19 @@ public:
     /// La méthode update à appeler dans la boucle de jeu pour les graphes avec interface
     void update();
 
+    /// DELETE ET ADD VERTEX
     void deleteVertex(int i);
-
     void addVertex(int i);
 
+    /// DELETE ET ADD EDGES
     void deleteEdges(int i);
-
     void addEdges(int i);
 
     /// Spécifie toutes les capacités de portage de chaque individus par rapport à son environnement
     void init_consumption_Vertices();
+
+    /// Mise à jour des population de chaque sommet en fonction de leur influence
+    void evolution();
 
     ///affichage des maps
     void initTabAdja();
