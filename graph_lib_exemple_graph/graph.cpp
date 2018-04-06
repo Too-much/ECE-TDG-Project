@@ -259,6 +259,15 @@ GraphInterface::GraphInterface(int x, int y, int w, int h)
     m_buttonAdd.add_child(m_buttonAdd_label);
     m_buttonAdd_label.set_message("ADD");
 
+
+    m_tool_box.add_child(m_simulation);
+    m_simulation.set_dim(50,50);
+    m_simulation.set_bg_color(GRISCLAIR);
+    m_simulation.set_pos(25,400);
+    m_tool_box.add_child(m_textSimulation);
+    m_textSimulation.set_message("-> PLAY");
+    m_textSimulation.set_pos(20,460);
+
     // MAIN BOX
     m_top_box.add_child(m_main_box);
     m_main_box.set_dim(908,720);
@@ -300,8 +309,8 @@ void Graph::init_consumption_Vertices()
             }
             it->second.m_consumption = k_sommet;
             //std::cout<<"le k du sommet : "<<it->first<<" est "<<it->second.m_consumption<<std::endl<<std::endl;
-
     }
+    std::cout << "OUI" << std::endl;
 }
 
 ///mise à jour des pop de chaques sommets en fonction des influences respectives
@@ -437,11 +446,11 @@ void Graph::deleteEdges(int i)
 // Ajoute une arete apres select
 void Graph::addEdges(int i)
 {
-    if( (m_edges[i].m_interface->m_select2.get_value() && !m_edges[i].m_active2 && m_interface->m_buttonAdd.clicked() ) || !m_edges[i].m_active2 && !m_edges[i].m_active )
+    if( (m_edges[i].m_interface->m_select2.get_value() && !m_edges[i].m_active2 && m_interface->m_buttonAdd.clicked() ) || (!m_edges[i].m_active2 && !m_edges[i].m_active ) )
     {
         if(m_vertices[m_edges[i].m_from].m_active && m_vertices[m_edges[i].m_to].m_active)
         {
-            for (int j(0); j<tab.size();++j)
+            for (unsigned int j(0); j<tab.size();++j)
             if(tab[j]==i)
                 tab.erase(tab.begin()+j);
             m_edges[i].m_active2 = true;
@@ -477,9 +486,12 @@ void Graph::update()
     if (!m_interface)
         return;
 
-    init_consumption_Vertices();
-
-    //evolution();
+    if(m_interface->m_simulation.get_value() && clock()%100 == 0)
+    {
+        //g.evolution();
+        init_consumption_Vertices();
+        std::cout << CLOCKS_PER_SEC << std::endl;
+    }
 
     for (auto &elt : m_vertices)
     {

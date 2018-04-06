@@ -76,6 +76,7 @@
 #include <string>
 #include <memory>
 #include <fstream>
+#include <time.h>
 
 #include "grman/grman.h"
 
@@ -343,8 +344,9 @@ private :
     grman::WidgetButton m_buttonAdd;
     grman::WidgetText m_buttonAdd_label;
 
-    // A compléter éventuellement par des widgets de décoration ou
-    // d'édition (boutons ajouter/enlever ...)
+    // Creation de la boite de lancement de simulation
+    grman::WidgetCheckBox m_simulation;
+    grman::WidgetText m_textSimulation;
 
 public :
 

@@ -17,13 +17,13 @@ int main()
     g.initTabAdja();
     g.make_example();
 
-
     /// Vous gardez la main sur la "boucle de jeu"
     /// ( contrairement à des frameworks plus avancés )
     while ( !key[KEY_ESC] )
     {
         g.save_graph("countryside");
         /// Il faut appeler les méthodes d'update des objets qui comportent des widgets
+
         g.update();
 
         /// Mise à jour générale (clavier/souris/buffer etc...)

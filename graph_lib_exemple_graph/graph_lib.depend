@@ -75,7 +75,7 @@
 	<loadpng.h>
 	<jpgalleg.h>
 
-1522926363 c:\users\xavier de cazenove\documents\projet\ece-tdg-project\graph_lib_exemple_graph\grman\grman.h
+1523041063 c:\users\xavier de cazenove\documents\projet\ece-tdg-project\graph_lib_exemple_graph\grman\grman.h
 	<allegro.h>
 	<string>
 	"grman_couleurs.h"
@@ -84,7 +84,7 @@
 
 1522926363 c:\users\xavier de cazenove\documents\projet\ece-tdg-project\graph_lib_exemple_graph\grman\grman_couleurs.h
 
-1522946976 c:\users\xavier de cazenove\documents\projet\ece-tdg-project\graph_lib_exemple_graph\grman\widget.h
+1523041063 c:\users\xavier de cazenove\documents\projet\ece-tdg-project\graph_lib_exemple_graph\grman\widget.h
 	"grman.h"
 	<iostream>
 	<string>
@@ -95,20 +95,21 @@
 1522926363 source:c:\users\xavier de cazenove\documents\projet\ece-tdg-project\graph_lib_exemple_graph\grman\widget.cpp
 	"widget.h"
 
-1523027465 source:c:\users\xavier de cazenove\documents\projet\ece-tdg-project\graph_lib_exemple_graph\main.cpp
+1523044659 source:c:\users\xavier de cazenove\documents\projet\ece-tdg-project\graph_lib_exemple_graph\main.cpp
 	"grman/grman.h"
 	<iostream>
 	"graph.h"
 
-1523036720 c:\users\xavier de cazenove\documents\projet\ece-tdg-project\graph_lib_exemple_graph\graph.h
+1523044659 c:\users\xavier de cazenove\documents\projet\ece-tdg-project\graph_lib_exemple_graph\graph.h
 	<vector>
 	<map>
 	<string>
 	<memory>
 	<fstream>
+	<time.h>
 	"grman/grman.h"
 
-1523038196 source:c:\users\xavier de cazenove\documents\projet\ece-tdg-project\graph_lib_exemple_graph\graph.cpp
+1523044417 source:c:\users\xavier de cazenove\documents\projet\ece-tdg-project\graph_lib_exemple_graph\graph.cpp
 	"graph.h"
 
 1522843249 source:c:\users\asus\ece-tdg-project\ece-tdg-project\graph_lib_exemple_graph\graph.cpp
