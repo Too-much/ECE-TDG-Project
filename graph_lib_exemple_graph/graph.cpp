@@ -641,7 +641,8 @@ void Graph::initTabAdja()
     for(std::map<int, Edge>::iterator it = m_edges.begin(); it != m_edges.end(); ++it)
     {
         m_adjacensePoids[it->second.m_from][it->second.m_to]=it->second.m_weight;
-        m_adjacensePoids[it->second.m_to][it->second.m_from]=it->second.m_weight;
+       // m_adjacensePoids[it->second.m_to][it->second.m_from]=it->second.m_weight;
+       //ne doit pas etre mise car cela rend le tableau d'adjacense symétrique
     }
 
     ///on affiche le tableau d'adjacense
@@ -773,3 +774,108 @@ void Graph::save_graph(std::string nom_fichier)
         std::cout << "Error lors du chargement du fichier !" << std::endl;
     }
 }
+
+///*******************************************************************************************************
+///************************************** FORTE CONNEXITE ************************************************
+///*******************************************************************************************************
+
+
+///algo pour trouver la forte connexité V2
+void Graph::algo_forte_connexite()
+{
+
+    //initialisation
+    int n=0;
+    std::stack<int> pile;
+    std::vector<int> pref;      //pour savoir si le sommet est marqué
+    std::vector<int> ret;
+    std::vector<std::vector<int>> comp;     // ensemble des composants fortements connexes
+    std::vector<bool> dansPile;     //pour savoir si le sommet est dans la pile
+
+    //initialisation des vecteurs
+    for(int s=0; s<m_ordre; ++s)
+    {
+        pref.push_back(0);
+        ret.push_back(0);
+        dansPile.push_back(false);
+    }
+
+    //calcul de toutes les CFC
+    for(int s=0; s<m_ordre; ++s)
+    {
+        if(pref[s]==0)
+        {
+            CFC(s,n,pile,pref,ret,comp,dansPile);
+        }
+    }
+
+
+    //affichage des composants fortements connexes
+    std::cout<<std::endl<<"Tableau des composantes fortement connexes : "<<std::endl;
+    for(unsigned int w=0; w<comp.size(); w++)
+    {
+        for(unsigned int z=0; z<comp[w].size(); z++)
+        {
+            std::cout<<comp[w][z] <<" ";
+        }
+        std::cout<<std::endl;
+    }
+    std::cout<<std::endl<<std::endl<<std::endl;
+    std::cout<<comp.size();
+}
+
+void Graph::CFC(int x,int& n, std::stack<int>& pile, std::vector<int>& pref, std::vector<int>& ret, std::vector<std::vector<int>>& comp, std::vector<bool> dansPile )
+{
+    //initialisation des variables
+    int y;
+    int m;
+    std::cout<<"X : "<<x<<std::endl;
+
+
+    pref[x]=n;      //on marque le sommet x;
+    m=pref[x];
+    n=n+1;
+    pile.push(x);
+    dansPile[x]=true;
+
+    for (y=0; y<m_ordre; y++)
+    {
+        if(m_adjacensePoids[x][y])
+        {
+            if(pref[y]==0)
+            {
+                CFC(y,n,pile,pref,ret,comp,dansPile);     //parcours en profondeur récursif
+
+                if(pref[x]<ret[y])
+                    m=pref[x];
+                else
+                    m=ret[y];
+            }
+            else if(dansPile[y])
+            {
+                if(m<pref[y])
+                    m=m;
+                else
+                    m=pref[y];
+            }
+        }
+    }
+
+    ret[x]=m;
+    if(m==pref[x])     //si x est une racine, alors on calcul la composante fortement connexe associée
+    {
+
+        std::vector<int> unecompconnexe;
+        do
+        {
+            y=pile.top();
+            pile.pop();
+            dansPile[y]=false;
+            unecompconnexe.push_back(y);
+            std::cout<<"Y : "<<y<<std::endl;
+        }while(x!=y);
+        comp.push_back(unecompconnexe);
+    }
+
+}
+

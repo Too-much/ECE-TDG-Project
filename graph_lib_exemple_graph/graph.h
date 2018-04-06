@@ -77,6 +77,7 @@
 #include <memory>
 #include <fstream>
 #include <time.h>
+#include <stack>
 
 #include "grman/grman.h"
 
@@ -426,6 +427,11 @@ public:
 
     /// Enregistre les valeurs des Aretes dans le fichier
     void save_graph(std::string nom_fichier);
+
+    ///algo pour trouver la forte connexité V2
+    void algo_forte_connexite();
+
+    void CFC(int x,int& n, std::stack<int>& pile, std::vector<int>& pref, std::vector<int>& ret, std::vector<std::vector<int>>& comp, std::vector<bool> dansPile );
 };
 
 
