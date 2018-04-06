@@ -237,6 +237,11 @@ private :
 
     // Un label de visualisation du poids de l'arc
     grman::WidgetText m_label_weight;
+    grman::WidgetText m_name;
+
+    // Si il est select dans main et dans toolbox
+    grman::WidgetCheckBox m_select;
+    grman::WidgetCheckBox m_select2;
 
 public :
 
@@ -264,7 +269,9 @@ private :
     double m_weight;
 
     ///Si supression ou non
-    bool m_active;
+    bool m_active = true;
+    bool m_active2 = true;
+    bool m_active3 =false;
 
     /// le POINTEUR sur l'interface associée, nullptr -> pas d'interface
     //std::shared_ptr<EdgeInterface> m_interface = nullptr;
@@ -282,6 +289,8 @@ public:
     /// Ici on ne donne qu'un seul constructeur qui peut utiliser une interface
     Edge (double weight=0, EdgeInterface *interface=nullptr) :
         m_weight(weight), m_interface(interface)  {  }
+    Edge(int from, int to, double weight) :
+        m_from(from), m_to(to), m_weight(weight){}
 
     ///getters et setters
     int get_from()
@@ -362,7 +371,6 @@ private :
     grman::WidgetButton m_buttonAdd;
     grman::WidgetText m_buttonAdd_label;
 
-
     // A compléter éventuellement par des widgets de décoration ou
     // d'édition (boutons ajouter/enlever ...)
 
@@ -399,6 +407,8 @@ private :
     ///capacité de portage (places dispo) de l'environnement
     int m_capacity;
 
+    std::vector<int> tab;
+
 
 public:
 
@@ -423,6 +433,10 @@ public:
     void deleteVertex(int i);
 
     void addVertex(int i);
+
+    void deleteEdges(int i);
+
+    void addEdges(int i);
 
     /// Spécifie toutes les capacités de portage de chaque individus par rapport à son environnement
     void init_consumption_Vertices();

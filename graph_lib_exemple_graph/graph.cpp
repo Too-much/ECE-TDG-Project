@@ -120,6 +120,9 @@ Edge::Edge(std::ifstream& fc)
     fc >> m_from;
     fc >> m_to;
     fc >> m_weight;
+    fc >> m_active;
+    fc >> m_active2;
+    fc >> m_active3;
     m_interface=nullptr;
 }
 
@@ -138,8 +141,14 @@ EdgeInterface::EdgeInterface(Vertex& from, Vertex& to, double weight)
 
     // Une boite pour englober les widgets de réglage associés
     m_top_edge.add_child(m_box_edge);
-    m_box_edge.set_dim(24,60);
+    m_box_edge.set_dim(32,60);
     m_box_edge.set_bg_color(BLANCBLEU);
+
+    m_box_edge.add_child(m_select);
+    m_select.set_dim(5,5);
+    m_select.set_bg_color(BLANCBLEU);
+    m_select.set_gravity_xy(grman::GravityX::Left,grman::GravityY::Down);
+
 
     // Le slider de réglage de valeur
     m_box_edge.add_child( m_slider_weight );
@@ -149,7 +158,7 @@ EdgeInterface::EdgeInterface(Vertex& from, Vertex& to, double weight)
 
     // Label de visualisation de valeur
     m_box_edge.add_child( m_label_weight );
-    m_label_weight.set_gravity_y(grman::GravityY::Down);
+    m_label_weight.set_gravity_xy(grman::GravityX::Right,grman::GravityY::Down);
 
 }
 
@@ -162,25 +171,25 @@ void Edge::pre_update()
         return;
 
     if(m_weight>=90&&m_weight<100)
-        m_interface->m_top_edge.setEdgeColor(NOIR);
-    if(m_weight>=80&&m_weight<90)
-        m_interface->m_top_edge.setEdgeColor(GRISSOMBRE);
-    if(m_weight>=70&&m_weight<80)
-        m_interface->m_top_edge.setEdgeColor(GRIS);
-    if(m_weight>=60&&m_weight<70)
-        m_interface->m_top_edge.setEdgeColor(GRISCLAIR);
-    if(m_weight>=50&&m_weight<60)
         m_interface->m_top_edge.setEdgeColor(ROUGESOMBRE);
-    if(m_weight>=40&&m_weight<50)
+    if(m_weight>=80&&m_weight<90)
         m_interface->m_top_edge.setEdgeColor(ROUGE);
-    if(m_weight>=30&&m_weight<40)
+    if(m_weight>=70&&m_weight<80)
         m_interface->m_top_edge.setEdgeColor(ROUGECLAIR);
+    if(m_weight>=60&&m_weight<70)
+        m_interface->m_top_edge.setEdgeColor(ORANGESOMBRE);
+    if(m_weight>=50&&m_weight<60)
+        m_interface->m_top_edge.setEdgeColor(ORANGE);
+    if(m_weight>=40&&m_weight<50)
+        m_interface->m_top_edge.setEdgeColor(ORANGECLAIR);
+    if(m_weight>=30&&m_weight<40)
+        m_interface->m_top_edge.setEdgeColor(JAUNESOMBRE);
     if(m_weight>=20&&m_weight<30)
-        m_interface->m_top_edge.setEdgeColor(VERTSOMBRE);
+        m_interface->m_top_edge.setEdgeColor(JAUNE);
     if(m_weight>=10&&m_weight<20)
-        m_interface->m_top_edge.setEdgeColor(VERT);
+        m_interface->m_top_edge.setEdgeColor(JAUNECLAIR);
     if(m_weight>=0&&m_weight<10)
-        m_interface->m_top_edge.setEdgeColor(VERTCLAIR);
+        m_interface->m_top_edge.setEdgeColor(VERT);
 
     /// Copier la valeur locale de la donnée m_weight vers le slider associé
     m_interface->m_slider_weight.set_value(m_weight);
@@ -283,27 +292,23 @@ void Graph::deleteVertex(int i)
     // Fonction permettant de : - DELETE un sommet
     //                          - Detruire l'interface du sommet sur la main BOX
     //                          - Ajoute le sommet dans la TOOLBOX afin de pouvoir le reADD plus tard
-    if( (m_vertices[i].m_interface->m_select.get_value() && m_interface->m_buttonDel.clicked())|| m_vertices[i].m_saveSupp)
+    if( (m_vertices[i].m_interface->m_select.get_value() && m_interface->m_buttonDel.clicked()) || m_vertices[i].m_saveSupp)
     {
-        int j(0);
-        // Check si il y a déja des sommet enlever pour l'affichage dans la tool bar
-        for (auto &elt2 : m_vertices)
-        {
-            if(elt2.second.m_active || elt2.second.m_saveSupp)
-                j=j+3;
-        }
+        tab.push_back(i);
+
         m_vertices[i].m_active = false;
         m_vertices[i].m_saveSupp = false; // evite de tourner dans ce if pour les sommets DELETED
-
         m_vertices[i].m_interface->m_select.set_value(false);
-        m_interface->m_main_box.remove_child(m_vertices[i].m_interface->m_top_box);
-        m_interface->m_tool_box.add_child(m_vertices[i].m_interface->m_label_idx);
 
-        m_vertices[i].m_interface->m_label_idx.set_pos(toolX,toolY*j);
+        m_interface->m_main_box.remove_child(m_vertices[i].m_interface->m_top_box); // Remove
+
+        m_interface->m_tool_box.add_child(m_vertices[i].m_interface->m_label_idx); // recre dans la toolbox
         m_vertices[i].m_interface->m_label_idx.set_message(m_vertices[i].m_namePicture);
+        m_vertices[i].m_interface->m_label_idx.set_pos(toolX,(toolY+10)*tab.size());
+
         m_interface->m_tool_box.add_child(m_vertices[i].m_interface->m_select2);
         m_vertices[i].m_interface->m_select2.set_dim(10,10);
-        m_vertices[i].m_interface->m_select2.set_pos(toolX-15,toolY*j);
+        m_vertices[i].m_interface->m_select2.set_pos(toolX-15,(toolY+10)*tab.size());
         m_vertices[i].m_interface->m_select2.set_value(false);
     }
 }
@@ -314,11 +319,82 @@ void Graph::addVertex(int i)
     //                          - Cree l'interface du sommet sur la main BOX
     if(m_vertices[i].m_interface->m_select2.get_value() && m_interface->m_buttonAdd.clicked())
     {
+        for (int j(0); j<tab.size();++j)
+            if(tab[j]==i)
+                tab.erase(tab.begin()+j);
+
+        for(std::map<int, Edge>::iterator it = m_edges.begin(); it != m_edges.end(); ++it)
+        {
+            if(it->second.m_from == i || it->second.m_to == i)
+            {
+                it->second.m_active = false;
+                it->second.m_active2 = false;
+            }
+        }
+
         m_vertices[i].m_active = true;
         m_vertices[i].m_interface->m_select2.set_value(false);
         m_interface->m_tool_box.remove_child(m_vertices[i].m_interface->m_label_idx);
         m_interface->m_tool_box.remove_child(m_vertices[i].m_interface->m_select2);
         add_interfaced_vertex(i,m_vertices[i].m_value,m_vertices[i].m_pos_x,m_vertices[i].m_pos_y,m_vertices[i].m_namePicture,0,m_vertices[i].m_growth);
+    }
+}
+
+// delete l'arete selectionner ou si les 1 des 2 sommets n'existe plus
+void Graph::deleteEdges(int i)
+{
+    if( (m_edges[i].m_interface->m_select.get_value() && m_interface->m_buttonDel.clicked() && m_edges[i].m_active2) || m_edges[i].m_active3 )
+    {
+        m_edges[i].m_active2 = false;
+        m_edges[i].m_active3 = false;
+        m_edges[i].m_interface->m_select.set_value(false);
+        tab.push_back(i);
+
+        std::string name("");
+        name = std::to_string((int)m_edges[i].m_from) + " -> " + std::to_string((int)m_edges[i].m_to);
+        m_interface->m_main_box.remove_child(m_edges[i].m_interface->m_top_edge); // Remove
+
+        m_interface->m_tool_box.add_child(m_edges[i].m_interface->m_select2);// Recree dans la toolbox
+        m_edges[i].m_interface->m_select2.set_value(false);
+        m_edges[i].m_interface->m_select2.set_dim(10,10);
+        m_edges[i].m_interface->m_select2.set_pos(toolX-15,(toolY+10)*tab.size());
+
+        m_interface->m_tool_box.add_child(m_edges[i].m_interface->m_name);
+        m_edges[i].m_interface->m_name.set_message(name);
+        m_edges[i].m_interface->m_name.set_pos(toolX, (toolY+10)*tab.size());
+    }
+
+    // On enleve les aretes des sommets DELETED
+    if( (!m_vertices[m_edges[i].m_from].m_active || !m_vertices[m_edges[i].m_to].m_active) && m_edges[i].m_active)
+    {
+        m_edges[i].m_active = false;
+        m_interface->m_main_box.remove_child(m_edges[i].m_interface->m_top_edge);
+    }
+}
+
+// Ajoute une arete apres select
+void Graph::addEdges(int i)
+{
+    if( (m_edges[i].m_interface->m_select2.get_value() && !m_edges[i].m_active2 && m_interface->m_buttonAdd.clicked() ) || !m_edges[i].m_active2 && !m_edges[i].m_active )
+    {
+        if(m_vertices[m_edges[i].m_from].m_active && m_vertices[m_edges[i].m_to].m_active)
+        {
+            for (int j(0); j<tab.size();++j)
+            if(tab[j]==i)
+                tab.erase(tab.begin()+j);
+            m_edges[i].m_active2 = true;
+            m_edges[i].m_active = true;
+            m_edges[i].m_interface->m_select2.set_value(false);
+            m_interface->m_tool_box.remove_child(m_edges[i].m_interface->m_name);
+            m_interface->m_tool_box.remove_child(m_edges[i].m_interface->m_select2);
+            add_interfaced_edge(i,m_edges[i].m_from,m_edges[i].m_to,m_edges[i].m_weight);
+        }
+    }
+
+    if( (m_vertices[m_edges[i].m_from].m_active && m_vertices[m_edges[i].m_to].m_active) && !m_edges[i].m_active)
+    {
+        m_edges[i].m_active = true;
+        add_interfaced_edge(i,m_edges[i].m_from, m_edges[i].m_to,m_edges[i].m_weight);
     }
 }
 
@@ -345,31 +421,18 @@ void Graph::update()
 
     for (auto &elt : m_edges)
     {
+        addEdges(elt.first);
+        deleteEdges(elt.first);
+
         // MAJ des poids des aretes
         elt.second.m_weight = m_vertices[elt.second.m_to].m_hunger * m_vertices[elt.second.m_to].m_value;
         if (elt.second.m_weight > 100)
             elt.second.m_weight = 100;
 
         elt.second.pre_update();
-
-        // On enleve les aretes des sommets DELETED
-        if( (!m_vertices[elt.second.m_from].m_active || !m_vertices[elt.second.m_to].m_active) && elt.second.m_active)
-        {
-            elt.second.m_active = false;
-            m_interface->m_main_box.remove_child(elt.second.m_interface->m_top_edge);
-        }
-        if( (m_vertices[elt.second.m_from].m_active && m_vertices[elt.second.m_to].m_active) && !elt.second.m_active)
-        {
-            elt.second.m_active = true;
-            add_interfaced_edge(elt.first,elt.second.m_from,elt.second.m_to,elt.second.m_weight);
-        }
     }
 
-
-
     m_interface->m_top_box.update();
-
-
 
     for (auto &elt : m_vertices)
     {
@@ -380,14 +443,10 @@ void Graph::update()
         }
     }
 
-
     for (auto &elt : m_edges)
     {
         elt.second.post_update();
     }
-
-
-
 }
 
 /// Aide à l'ajout de sommets interfacés
@@ -433,7 +492,7 @@ void Graph::make_example()
 
     for(std::map<int, Edge>::iterator it(m_edges.begin()); it!=m_edges.end(); ++it)
     {
-        if(it->second.m_active)
+        //if(it->second.m_active || it->second.m_active2)
             add_interfaced_edge(it->first, it->second.m_from, it->second.m_to, it->second.m_weight);
     }
 }
@@ -499,6 +558,14 @@ void Graph::initTabAdja()
 
 }
 
+
+
+
+
+
+
+
+
 // Methode de telechargement des données depuis un fichier
 void Graph::load_graph(std::string nom_fichier)
 {
@@ -562,6 +629,12 @@ void Graph::save_graph(std::string nom_fichier)
             fc << it->second.m_from << " ";
             fc << it->second.m_to << " ";
             fc << it->second.m_weight << " ";
+            fc << it->second.m_active << " ";
+            fc << it->second.m_active2 << " ";
+            if(!it->second.m_active2 && it->second.m_active)
+                fc << true << " ";
+            else
+                fc << it->second.m_active3 << " ";
         }
 
         // Ecrit la map VERTEX dans le fichier
