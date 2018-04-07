@@ -47,13 +47,8 @@ int main()
                     if(choix2==1)
                     {
                         //on initialise le graphe
-                        Graph g;
-                        g.load_graph("countryside");
-                        g.initTabAdja();
-                        g.algo_forte_connexite();
-                        g.make_example();
-                        g.k_arete_conexe();
-                        g.k_sommet_connexe();
+                        Graph g("countryside", "coupe_paysage.jpg");
+
                         //boucle de jeu du premier graphe
                         while(!key[KEY_N])
                         {
@@ -84,11 +79,67 @@ int main()
                     }
                     if(choix2==2)
                     {
+                         /*Graph g2("dinosaure", "dinosaure.jpg");
 
+                        //boucle de jeu du premier graphe
+                        while(!key[KEY_N])
+                        {
+                            ++compteur_simulation;
+
+                            // Il faut appeler les méthodes d'update des objets qui comportent des widgets
+                            g2.update(compteur_simulation);
+                            g2.majTabAdja();
+
+                            g2.save_graph("ocean");
+
+                            // Mise à jour générale (clavier/souris/buffer etc...)
+                            grman::mettre_a_jour();
+
+                            if(key[KEY_N])      //on revient au menu général
+                                menu=true;
+
+                            if(key[KEY_ESC])    //si echape, on quitte directement le jeu
+                            {
+                                grman::fermer_allegro();
+                                return 0;
+                            }
+
+                            if(compteur_simulation%100 == 0)
+                                compteur_simulation=0;
+                        }
+                    */
                     }
-                    if(choix==3)
-                    {
 
+                    if(choix2==3)
+                    {
+                        Graph g3("ocean", "banquise.jpg");
+
+                        //boucle de jeu du premier graphe
+                        while(!key[KEY_N])
+                        {
+                            ++compteur_simulation;
+
+                            // Il faut appeler les méthodes d'update des objets qui comportent des widgets
+                            g3.update(compteur_simulation);
+                            g3.majTabAdja();
+
+                            g3.save_graph("ocean");
+
+                            // Mise à jour générale (clavier/souris/buffer etc...)
+                            grman::mettre_a_jour();
+
+                            if(key[KEY_N])      //on revient au menu général
+                                menu=true;
+
+                            if(key[KEY_ESC])    //si echape, on quitte directement le jeu
+                            {
+                                grman::fermer_allegro();
+                                return 0;
+                            }
+
+                            if(compteur_simulation%100 == 0)
+                                compteur_simulation=0;
+                        }
                     }
 
                 }

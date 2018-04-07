@@ -18,6 +18,7 @@ Vertex::Vertex(std::ifstream& fc)
     fc >> m_mortality;
     fc >> m_active;
     fc >> m_saveSupp;
+    fc >> m_event;
     m_interface=nullptr;
 }
 
@@ -208,7 +209,7 @@ void Edge::post_update()
 
 /// Ici le constructeur se contente de préparer un cadre d'accueil des
 /// éléments qui seront ensuite ajoutés lors de la mise ne place du Graphe
-GraphInterface::GraphInterface(int x, int y, int w, int h)
+GraphInterface::GraphInterface(int x, int y, int w, int h, std::string photo)
 {
     m_top_box.set_dim(1020,760);
     m_top_box.set_gravity_xy(grman::GravityX::Center, grman::GravityY::Center);
@@ -249,22 +250,33 @@ GraphInterface::GraphInterface(int x, int y, int w, int h)
     m_buttonAdd.add_child(m_buttonAdd_label);
     m_buttonAdd_label.set_message("ADD");
 
-
+    // BOUTTON LANCEMENT SIMULATION
     m_tool_box.add_child(m_simulation);
     m_simulation.set_dim(50,50);
     m_simulation.set_bg_color(GRISCLAIR);
     m_simulation.set_pos(25,400);
     m_tool_box.add_child(m_textSimulation);
-    m_textSimulation.set_message("-> PLAY");
-    m_textSimulation.set_pos(20,460);
+    m_textSimulation.set_message("PLAY");
+    m_textSimulation.set_pos(35,460);
+
+    //BOUTTON LANCEMENT EVENT
+    if(photo=="banquise.jpg")
+    {
+        m_tool_box.add_child(m_event);
+        m_event.set_dim(40,40);
+        m_event.set_bg_color(GRISCLAIR);
+        m_event.set_pos(30,270);
+        m_tool_box.add_child(m_nomEvent);
+        m_nomEvent.set_message("EVENT");
+        m_nomEvent.set_pos(32,320);
+    }
 
     // MAIN BOX
     m_top_box.add_child(m_main_box);
     m_main_box.set_dim(908,720);
     m_main_box.set_gravity_xy(grman::GravityX::Right, grman::GravityY::Up);
-    m_main_box.set_bg_color(BLEU);
     m_main_box.add_child(m_img);
-    m_img.set_pic_name("coupe_paysage.jpg");
+    m_img.set_pic_name(photo);
 
     //bouton pour la forte connexité
     m_tool_box.add_child(m_buttonFCC);
@@ -299,10 +311,12 @@ void Graph::init_consumption_Vertices()
                     for(unsigned int i(0); i<it->second.m_in.size();++i)
                         if(m_vertices[it->second.m_in[i]].m_active)
                             k = k + ( it2->second.m_weight * m_vertices[it->second.m_in[i]].m_value );
+                        if(it->second.m_in.size() == 0)
+                            k = 50;
             }
             it->second.m_consumption = k;
 
-            if(it->second.m_in.size() == 0)
+            if(it->second.m_in.size() == 0 && !it->second.m_event)
                 it->second.m_consumption = 1000;
         }
     }
@@ -317,7 +331,10 @@ void Graph::evolution()
         if(it->second.m_active)
         {
             int rapport_n_k = it->second.m_value/it->second.m_consumption;
-            it->second.m_value=it->second.m_value*(1+it->second.m_growth*(1-rapport_n_k))-it->second.m_mortality;
+            if(m_interface->m_event.get_value() && it->second.m_event)
+                it->second.m_value=it->second.m_value*(1+it->second.m_growth*(1-rapport_n_k))-(it->second.m_mortality+20);
+            else
+                it->second.m_value=it->second.m_value*(1+it->second.m_growth*(1-rapport_n_k))-it->second.m_mortality;
             for(std::map<int, Edge>::iterator it2(m_edges.begin()); it2!=m_edges.end(); ++it2)
             {
                 if(it2->second.m_active || it2->second.m_active2)
@@ -577,35 +594,6 @@ void Graph::add_interfaced_edge(int idx, int id_vert1, int id_vert2, double weig
     m_edges[idx].m_interface = ei;
 }
 
-/// Méthode spéciale qui construit un graphe arbitraire (démo)
-/// Cette méthode est à enlever et remplacer par un système
-/// de chargement de fichiers par exemple.
-/// Bien sûr on ne veut pas que vos graphes soient construits
-/// "à la main" dans le code comme ça.
-void Graph::make_example()
-{
-    m_interface = std::make_shared<GraphInterface>(50, 0, 750, 600);
-    // La ligne précédente est en gros équivalente à :
-    // m_interface = new GraphInterface(50, 0, 750, 600);
-
-    for(std::map<int, Vertex>::iterator it(m_vertices.begin()); it!=m_vertices.end(); ++it)
-    {
-        add_interfaced_vertex(it->first, it->second.m_value, it->second.m_pos_x, it->second.m_pos_y, it->second.m_namePicture,0,it->second.m_growth);
-    }
-
-    /// Les arcs doivent être définis entre des sommets qui existent !
-    // AJouter l'arc d'indice 0, allant du sommet 1 au sommet 2 de poids 50 etc...
-
-    for(std::map<int, Edge>::iterator it(m_edges.begin()); it!=m_edges.end(); ++it)
-    {
-        add_interfaced_edge(it->first, it->second.m_from, it->second.m_to, it->second.m_weight);
-    }
-}
-
-
-
-
-
 
 
 /********************************************************************************************
@@ -618,6 +606,8 @@ void Graph::make_example()
 ///inititialisation du tableau d'adjacense
 void Graph::initTabAdja()
 {
+    std::cout << "YO 1" << std::endl;
+
     //on initialise le tableau d'adjacense et le tableau d'adjacense symetrique
     for(int w=0; w<m_ordre; w++)
     {
@@ -629,6 +619,7 @@ void Graph::initTabAdja()
             m_adjacensePoidsSymetrique[w].push_back(0);
         }
     }
+    std::cout << "YO 2" << std::endl;
 
     for(std::map<int, Vertex>::iterator it = m_vertices.begin(); it != m_vertices.end(); ++it)
     {
@@ -644,10 +635,12 @@ void Graph::initTabAdja()
             }
         }
     }
+    std::cout << "YO 3" << std::endl;
 
     //on donne les valeurs du fichier au tableau d'adjacense
     majTabAdja();
 
+    std::cout << "YO 4" << std::endl;
     //on affiche le tableau d'adjacense
     std::cout<<"Tableau d'adjacense : "<<std::endl;
     for(int w=0; w<m_ordre; w++)
@@ -731,6 +724,9 @@ void Graph::load_graph(std::string nom_fichier)
             fc >> recup;
             m_vertices.insert(std::pair<int,Vertex>(recup,Vertex(fc)));
         }
+
+        for(std::map<int, Vertex>::iterator it(m_vertices.begin()); it!=m_vertices.end(); ++it)
+            std::cout << it->second.m_namePicture << std::endl;
     }
 
     else
@@ -782,6 +778,7 @@ void Graph::save_graph(std::string nom_fichier)
                 fc << true << " ";
             else
                 fc << it->second.m_saveSupp << " ";
+            fc << it->second.m_event << " ";
         }
     }
 

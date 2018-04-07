@@ -178,6 +178,9 @@ private :
     /// Bool pour faire fonctionner la sauvegarde des sommets supp
     bool m_saveSupp;
 
+    /// Si influencer par l'EVENEMENT
+    bool m_event = false;
+
     /// Coef d'individu mort par tour
     float m_mortality;
 
@@ -274,7 +277,7 @@ private :
     ///Si supression ou non
     bool m_active = true;
     bool m_active2 = true;
-    bool m_active3 =false;
+    bool m_active3 = false;
 
     /// le POINTEUR sur l'interface associée, nullptr -> pas d'interface
     //std::shared_ptr<EdgeInterface> m_interface = nullptr;
@@ -354,11 +357,15 @@ private :
     grman::WidgetButton m_buttonFCC;
     grman::WidgetText m_textFCC;
 
+    // Boutton de lancement EVENT
+    grman::WidgetCheckBox m_event;
+    grman::WidgetText m_nomEvent;
+
 public :
 
     // Le constructeur met en place les éléments de l'interface
     // voir l'implémentation dans le .cpp
-    GraphInterface(int x, int y, int w, int h);
+    GraphInterface(int x, int y, int w, int h, std::string photo);
 };
 
 
@@ -406,15 +413,27 @@ public:
     Graph (GraphInterface *interface=nullptr) :
         m_interface(interface)  {  }
 
+    Graph (std::string fichier, std::string photo)
+    {
+        load_graph(fichier);
+
+        m_interface = std::make_shared<GraphInterface>(50, 0, 750, 600, photo);
+
+        // Creeer les widget des sommet et aretes
+        for(std::map<int, Vertex>::iterator it(m_vertices.begin()); it!=m_vertices.end(); ++it)
+            add_interfaced_vertex(it->first, it->second.m_value, it->second.m_pos_x, it->second.m_pos_y, it->second.m_namePicture,0,it->second.m_growth);
+        for(std::map<int, Edge>::iterator it(m_edges.begin()); it!=m_edges.end(); ++it)
+            add_interfaced_edge(it->first, it->second.m_from, it->second.m_to, it->second.m_weight);
+
+        initTabAdja();
+        algo_forte_connexite();
+        k_arete_conexe();
+        k_sommet_connexe();
+    }
+
     void add_interfaced_vertex(int idx, double value, int x, int y, std::string pic_name="", int pic_idx=0, int growthcolor=0, bool active=0);
 
     void add_interfaced_edge(int idx, int vert1, int vert2, double weight=0);
-
-    /// Méthode spéciale qui construit un graphe arbitraire (démo)
-    /// Voir implémentation dans le .cpp
-    /// Cette méthode est à enlever et remplacer par un système
-    /// de chargement de fichiers par exemple.
-    void make_example();
 
     /// La méthode update à appeler dans la boucle de jeu pour les graphes avec interface
     void update(int compteur_simulation);
