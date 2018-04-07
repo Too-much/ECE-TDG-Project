@@ -78,6 +78,7 @@
 #include <fstream>
 #include <time.h>
 #include <stack>
+#include <queue>
 
 #include "grman/grman.h"
 
@@ -377,6 +378,9 @@ private :
     ///tableau d'adjacense
     std::vector<std::vector<int>> m_adjacensePoids;
 
+    ///tableau d'adjacense symétrique (sans l'orientation des aretes)
+    std::vector<std::vector<int>> m_adjacensePoidsSymetrique;
+
     ///ordre du graphe
     int m_ordre;
 
@@ -446,7 +450,17 @@ public:
 
     void CFC(int x,int& n, std::stack<int>& pile, std::vector<int>& pref, std::vector<int>& ret,  std::vector<bool> dansPile );
 
+    ///fonction pour déterminer la couleur des sommets
     int colorChoice(int nb_color);
+
+    ///fonction pour déterminer la k-arete-connexité
+    void k_arete_conexe();
+
+    ///fonction pour déterminer la k-sommet-connexité
+    void k_sommet_connexe();
+
+    ///fonction pour voir si un graphe est simplement-connexe
+    bool grapheConnexe(std::vector<std::vector<int>> tab, int s);
 };
 
 

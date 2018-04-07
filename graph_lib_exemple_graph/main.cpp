@@ -51,6 +51,8 @@ int main()
                         g.initTabAdja();
                         g.algo_forte_connexite();
                         g.make_example();
+                        g.k_arete_conexe();
+                        g.k_sommet_connexe();
                         //boucle de jeu du premier graphe
                         while(!key[KEY_N])
                         {

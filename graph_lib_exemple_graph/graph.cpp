@@ -274,6 +274,7 @@ GraphInterface::GraphInterface(int x, int y, int w, int h)
     m_top_box.add_child(m_main_box);
     m_main_box.set_dim(908,720);
     m_main_box.set_gravity_xy(grman::GravityX::Right, grman::GravityY::Up);
+    m_main_box.set_bg_color(BLEU);
     m_main_box.add_child(m_img);
     m_img.set_pic_name("coupe_paysage.jpg");
 
@@ -641,13 +642,15 @@ void Graph::make_example()
 ///inititialisation du tableau d'adjacense
 void Graph::initTabAdja()
 {
-    //on initialise le tableau d'adjacense
+    //on initialise le tableau d'adjacense et le tableau d'adjacense symetrique
     for(int w=0; w<m_ordre; w++)
     {
         m_adjacensePoids.push_back( std::vector<int> () );
+        m_adjacensePoidsSymetrique.push_back(std::vector<int> ());
         for(int z=0; z<m_ordre; z++)
         {
             m_adjacensePoids[w].push_back(0);
+            m_adjacensePoidsSymetrique[w].push_back(0);
         }
     }
 
@@ -702,8 +705,13 @@ void Graph::majTabAdja()
     for(std::map<int, Edge>::iterator it = m_edges.begin(); it != m_edges.end(); ++it)
     {
         m_adjacensePoids[it->second.m_from][it->second.m_to]=it->second.m_active;
-        // m_adjacensePoids[it->second.m_to][it->second.m_from]=it->second.m_weight;
-        //ne doit pas etre mise car cela rend le tableau d'adjacense symétrique
+    }
+
+    //on donne les valeurs du fichier au tableau d'adjacense symétrique
+    for(std::map<int, Edge>::iterator it = m_edges.begin(); it != m_edges.end(); ++it)
+    {
+        m_adjacensePoidsSymetrique[it->second.m_from][it->second.m_to]=it->second.m_active2;
+        m_adjacensePoidsSymetrique[it->second.m_to][it->second.m_from]=it->second.m_active2;
     }
 }
 
@@ -943,4 +951,149 @@ int Graph::colorChoice(int nb_color)
         return VERTCLAIR;
     else
         return GRIS;
+}
+
+
+///*************************************************************************************************
+///************************************* ALGO K-ARETE-CONNEXE **************************************
+///*************************************************************************************************
+
+
+void Graph::k_arete_conexe()
+{
+    srand(time(NULL));  //initialise aleatoire
+    std::vector<Edge> arbre;   //cree un vecteur local qui permettra de stocker l'arbre fabriqué au fur a mesure par l'algo de prim
+    int indiceA =0;
+    std::vector <int> marques;  //tableau pour savoir si un sommet est marqué
+    int s,x,y,ymin,xmin;    // variable utile
+    int mini;
+
+
+
+    for(int i=0; i<m_ordre-1; i++)       //initialisation du vecteur arbre
+    {
+        arbre.push_back(Edge());
+    }
+    for(int i=0; i<m_ordre; i++)     //initialisation du vecteur marques
+    {
+        marques.push_back(0);
+    }
+
+    //on choisit aleatoirement le sommet de depart
+    s=rand()%m_ordre;
+
+    //marque le sommet choisis aleatoirement à 1
+    marques[s]=1;
+
+    //tant que les aretes de l'arbre ne sont pas toutes traités
+    while(indiceA<m_ordre-1)
+    {
+        //on initialise la longueur minimale a l'infini
+        mini=10000;
+
+        //pour tous les sommets x marques
+        //chercher le sommet de longueur minimale "ymin" adjacent a x et non marqué
+        for(x=0; x<m_ordre; x++)
+        {
+            if (marques[x]==1)
+            {
+                for(y=0; y<m_ordre; y++)
+                {
+                    if((m_adjacensePoidsSymetrique[x][y]!=0)&&(m_adjacensePoidsSymetrique[x][y]!=100)&&(marques[y]!=1)&&(m_adjacensePoidsSymetrique[x][y]<mini))
+                    {
+                        mini=m_adjacensePoidsSymetrique[x][y];
+                        ymin=y;
+                        xmin=x;
+                    }
+                }
+            }
+
+        }
+        marques[ymin]=1;
+        arbre[indiceA].m_weight=mini;
+        arbre[indiceA].m_from=xmin;
+        arbre[indiceA].m_to=ymin;
+        indiceA++;
+    }
+
+    ///on affiche le resultat
+    std::cout<<"Voici le resultat de l'algorithme de Prim (arbre recouvrant de plus petit poids) a partir du sommet "<<s<<std::endl<<std::endl;
+    for (auto elem: arbre)
+    {
+        std::cout<<"Arete "<<elem.m_from<<" - "<<elem.m_to<<"        de poids      "<<elem.m_weight<<std::endl;
+    }
+
+    std::cout<<std::endl<<"Le graphe est "<<arbre.size()<<"-arete-connexe."<<std::endl;
+
+}
+
+///******************************************************************************************************
+///************************************ ALGO k-SOMMET-CONNEXE *******************************************
+///******************************************************************************************************
+
+void Graph::k_sommet_connexe()
+{
+    std::vector<std::vector<int>> tab;
+
+    for(unsigned int k=0; k<m_adjacensePoidsSymetrique.size();k++)
+    {
+        std::cout<<"On supprime le sommet : "<<k<< " ";
+        tab = m_adjacensePoidsSymetrique;       //on fait une copie du tableau d'adjacense pour pouvoir le manipuler sans le modifier
+        for(unsigned int i=0; i< m_adjacensePoidsSymetrique[k].size();i++)
+            tab[i].erase(tab[i].begin()+k);
+
+        tab.erase(tab.begin()+k);       //on supprime le sommet que l'on test
+        grapheConnexe(tab,k);     //on appel la fonction qui détermine si ce nouveau graphe (sans k) est connexe
+    }
+}
+
+
+///fonction pour tester la connexité d'un graphe à partir de sa matrice d'adjacense
+bool Graph::grapheConnexe(std::vector<std::vector<int>> tab, int s)
+{
+    if (s!=0)
+        s=0;
+    else
+        s=1;
+    bool connexe=true; //booléen retourné à la fin de la fonction
+    std::vector<int> marques;   //vecteur pour savoir si un sommet est marqués
+    for(unsigned int i=0; i< tab.size(); ++i)   //initialisation du vecteur marques
+        marques.push_back(0);
+
+    ///Parcours en profnodeur (BFS)
+    std::queue<int> file;
+    file.push(s);   //on enfile s
+    marques[s]=1;   //on marques s
+
+    while (!file.empty())
+    {
+        s= file.front();
+        file.pop();
+
+        for (int t=0; t<m_ordre-1; ++t)       //parcours tous les sommets adjacents
+        {
+                if (!marques[t]&&tab[s][t])        //si le sommet adjacent n'est pas marqués
+                {
+                    file.push(t);       //on enfile t
+                    marques[t]=true;      //et on le marque
+                }
+        }
+    }
+
+    for (auto elem : marques)
+    {
+        if (elem==false)
+            connexe=false;      //si tous les sommets n'ont pas été marqués -> le graphe n'est pas connexe
+    }
+
+
+        for (auto elem : marques)
+    {
+        std::cout<<elem<<" - ";
+    }
+    if (!connexe)
+        std::cout<<"Le graphe n'est pas connexe"<<std::endl;
+    else
+        std::cout<<"Le graphe est connexe"<<std::endl;
+    return connexe;     //retourne si le graphe est connexe (true) ou s'il ne l'est pas (false)
 }

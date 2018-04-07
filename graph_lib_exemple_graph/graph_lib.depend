@@ -5,10 +5,10 @@
 1523045037 c:\users\ldevincre\desktop\ing2\projet_theorie_graphe\graph_lib_v1\graph_lib_exemple_graph\grman\coords.h
 	<cmath>
 
-1523095288 source:c:\users\ldevincre\desktop\ing2\projet_theorie_graphe\graph_lib_v1\graph_lib_exemple_graph\graph.cpp
+1523114948 source:c:\users\ldevincre\desktop\ing2\projet_theorie_graphe\graph_lib_v1\graph_lib_exemple_graph\graph.cpp
 	"graph.h"
 
-1523094425 c:\users\ldevincre\desktop\ing2\projet_theorie_graphe\graph_lib_v1\graph_lib_exemple_graph\graph.h
+1523103176 c:\users\ldevincre\desktop\ing2\projet_theorie_graphe\graph_lib_v1\graph_lib_exemple_graph\graph.h
 	<vector>
 	<map>
 	<string>
@@ -16,6 +16,7 @@
 	<fstream>
 	<time.h>
 	<stack>
+	<queue>
 	"grman/grman.h"
 
 1523045037 c:\users\ldevincre\desktop\ing2\projet_theorie_graphe\graph_lib_v1\graph_lib_exemple_graph\grman\grman.h
@@ -52,7 +53,7 @@
 1523045037 source:c:\users\ldevincre\desktop\ing2\projet_theorie_graphe\graph_lib_v1\graph_lib_exemple_graph\grman\widget.cpp
 	"widget.h"
 
-1523094401 source:c:\users\ldevincre\desktop\ing2\projet_theorie_graphe\graph_lib_v1\graph_lib_exemple_graph\main.cpp
+1523102222 source:c:\users\ldevincre\desktop\ing2\projet_theorie_graphe\graph_lib_v1\graph_lib_exemple_graph\main.cpp
 	"grman/grman.h"
 	<iostream>
 	"menu.h"
