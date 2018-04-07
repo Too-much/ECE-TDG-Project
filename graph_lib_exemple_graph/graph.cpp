@@ -14,11 +14,11 @@ Vertex::Vertex(std::ifstream& fc)
     fc >> m_pos_x;
     fc >> m_pos_y;
     fc >> m_value;
-    fc >> m_hunger;
+    fc >> m_growth;
+    fc >> m_mortality;
     fc >> m_active;
     fc >> m_saveSupp;
     m_interface=nullptr;
-    m_growth = 6;
 }
 
 /// Le constructeur met en place les éléments de l'interface
@@ -64,21 +64,6 @@ VertexInterface::VertexInterface(int idx, int x, int y, std::string pic_name, in
 
     m_box_label_idx.add_child( m_label_idx );
     m_label_idx.set_message( std::to_string(idx) );
-
-//    if(growth==0)
-//        m_top_box.set_bg_color(ROUGESOMBRE);
-//    if(growth==1)
-//        m_top_box.set_bg_color(ROUGE);
-//    if(growth==2)
-//        m_top_box.set_bg_color(ROUGECLAIR);
-//    if(growth==3)
-//        m_top_box.set_bg_color(VERTSOMBRE);
-//    if(growth==4)
-//        m_top_box.set_bg_color(VERT);
-//    if(growth==5)
-//        m_top_box.set_bg_color(VERTCLAIR);
-//    if(growth>=6)
-//        m_top_box.set_bg_color(BLANC);
 }
 
 /// Gestion du Vertex avant l'appel à l'interface
@@ -143,25 +128,24 @@ EdgeInterface::EdgeInterface(Vertex& from, Vertex& to, double weight)
 
     // Une boite pour englober les widgets de réglage associés
     m_top_edge.add_child(m_box_edge);
-    m_box_edge.set_dim(32,60);
+    m_box_edge.set_dim(32,70);
     m_box_edge.set_bg_color(BLANCBLEU);
 
     m_box_edge.add_child(m_select);
-    m_select.set_dim(5,5);
+    m_select.set_dim(10,5);
     m_select.set_bg_color(BLANCBLEU);
-    m_select.set_gravity_xy(grman::GravityX::Left,grman::GravityY::Down);
+    m_select.set_gravity_xy(grman::GravityX::Center,grman::GravityY::Up);
 
 
     // Le slider de réglage de valeur
     m_box_edge.add_child( m_slider_weight );
-    m_slider_weight.set_range(0.0, 100.0);  // CHANGE LA RANGE DES SLIDERS DES ARETES
+    m_slider_weight.set_range(0.0, 1.0);  // CHANGE LA RANGE DES SLIDERS DES ARETES
     m_slider_weight.set_dim(16,40);
-    m_slider_weight.set_gravity_y(grman::GravityY::Up);
+    m_slider_weight.set_gravity_y(grman::GravityY::Center);
 
     // Label de visualisation de valeur
     m_box_edge.add_child( m_label_weight );
     m_label_weight.set_gravity_xy(grman::GravityX::Right,grman::GravityY::Down);
-
 }
 
 
@@ -172,34 +156,38 @@ void Edge::pre_update()
     if (!m_interface)
         return;
 
-    if(m_weight>=90&&m_weight<100)
+
+    if(m_weight>=0.9&&m_weight<1)
         m_interface->m_top_edge.setEdgeColor(ROUGESOMBRE);
-    if(m_weight>=80&&m_weight<90)
+    if(m_weight>=0.80&&m_weight<0.90)
         m_interface->m_top_edge.setEdgeColor(ROUGE);
-    if(m_weight>=70&&m_weight<80)
+    if(m_weight>=0.70&&m_weight<0.80)
         m_interface->m_top_edge.setEdgeColor(ROUGECLAIR);
-    if(m_weight>=60&&m_weight<70)
+    if(m_weight>=0.60&&m_weight<0.70)
         m_interface->m_top_edge.setEdgeColor(ORANGESOMBRE);
-    if(m_weight>=50&&m_weight<60)
+    if(m_weight>=0.50&&m_weight<0.60)
         m_interface->m_top_edge.setEdgeColor(ORANGE);
-    if(m_weight>=40&&m_weight<50)
+    if(m_weight>=0.40&&m_weight<0.50)
         m_interface->m_top_edge.setEdgeColor(ORANGECLAIR);
-    if(m_weight>=30&&m_weight<40)
+    if(m_weight>=0.30&&m_weight<0.40)
         m_interface->m_top_edge.setEdgeColor(JAUNESOMBRE);
-    if(m_weight>=20&&m_weight<30)
+    if(m_weight>=0.20&&m_weight<0.30)
         m_interface->m_top_edge.setEdgeColor(JAUNE);
-    if(m_weight>=10&&m_weight<20)
+    if(m_weight>=0.10&&m_weight<0.20)
         m_interface->m_top_edge.setEdgeColor(JAUNECLAIR);
-    if(m_weight>=0&&m_weight<10)
+    if(m_weight>=0&&m_weight<0.10)
         m_interface->m_top_edge.setEdgeColor(VERT);
 
     /// Copier la valeur locale de la donnée m_weight vers le slider associé
-    m_interface->m_slider_weight.set_value(m_weight);
+    m_interface->m_slider_weight.set_value( m_weight);
 
+    std::string sendNumber("");
+    if(m_weight < 0.1)
+        sendNumber = "0.0" + std::to_string((int) (m_weight*100) );
+    else
+        sendNumber = "0." + std::to_string((int) (m_weight*100) ) ;
     /// Copier la valeur locale de la donnée m_weight vers le label sous le slider
-    m_interface->m_label_weight.set_message( std::to_string( (int)m_weight ) );
-
-
+    m_interface->m_label_weight.set_message(sendNumber);
 }
 
 /// Gestion du Edge après l'appel à l'interface
@@ -297,65 +285,57 @@ GraphInterface::GraphInterface(int x, int y, int w, int h)
 *********************************************************************************************/
 
 
-
-
 /// Methode permettant de calculer en temps reel la quantité de consommation d'un individu par rapport à ses adjacents
 void Graph::init_consumption_Vertices()
 {
     for(std::map<int, Vertex>::iterator it(m_vertices.begin()); it!=m_vertices.end(); ++it)
     {
-        //le k du mangeur
-        float k_sommet(0);
-
-        for(unsigned int i(0); i<it->second.m_out.size(); ++i)
+        if(it->second.m_active)
         {
+            float k(0.0);
             for(std::map<int, Edge>::iterator it2(m_edges.begin()); it2!=m_edges.end(); ++it2)
             {
-                //si on retrouve le sommet it2 dans les successeurs de it + arete corespondante
-                if(it->first == it2->second.m_from)
-                {
-                    //k_sommet = k_sommet + ( (it->second.m_hunger/it->second.m_out.size()) * it2->second.m_value);
-                    k_sommet = k_sommet + (it2->second.m_weight*m_vertices[it2->second.m_to].m_value);
-                }
+                if( it2->second.m_active || it2->second.m_active2)
+                    for(unsigned int i(0); i<it->second.m_in.size();++i)
+                        if(m_vertices[it->second.m_in[i]].m_active)
+                            k = k + ( it2->second.m_weight * m_vertices[it->second.m_in[i]].m_value );
             }
+            it->second.m_consumption = k;
+
+            if(it->second.m_in.size() == 0)
+                it->second.m_consumption = 1000;
         }
-        it->second.m_consumption = k_sommet;
-        //std::cout<<"le k du sommet : "<<it->first<<" est "<<it->second.m_consumption<<std::endl<<std::endl;
     }
-    std::cout << "OUI" << std::endl;
 }
 
+
 ///mise à jour des pop de chaques sommets en fonction des influences respectives
-/*void Graph::evolution()
+void Graph::evolution()
 {
-    ///pour chaque sommet
     for(std::map<int, Vertex>::iterator it(m_vertices.begin()); it!=m_vertices.end(); ++it)
     {
-        ///le quotient population/capacité de portage
-        int rapport_n_k = it->second.m_value/it->second.m_consumption;
-
-        std::cout << it->first << " K = " << it->second.m_consumption << std::endl;
-
-        ///N=n*[1+r*n*(1-n/K)] avec N = nbre à t+1 et n = nbre à t
-        it->second.m_value=it->second.m_value*(1+it->second.m_growth*(1-rapport_n_k));
-
-        for(unsigned int i=0; i<it->second.m_out.size(); i++)
+        if(it->second.m_active)
         {
-            for(std::map<int, Vertex>::iterator it2(m_vertices.begin()); it2!=m_vertices.end(); ++it2)
+            int rapport_n_k = it->second.m_value/it->second.m_consumption;
+            it->second.m_value=it->second.m_value*(1+it->second.m_growth*(1-rapport_n_k))-it->second.m_mortality;
+            for(std::map<int, Edge>::iterator it2(m_edges.begin()); it2!=m_edges.end(); ++it2)
             {
-                if(it2->first == it->second.m_out[i])
-                {
-                    ///regulation de la population en fonction des prédateurs
-                    it->second.m_value-=m_vertices[it->second.m_out[i]].m_value*it2->second.m_value;
-                    std::cout << it->first << "Pop = " << it->second.m_value << std::endl;
-                }
+                if(it2->second.m_active || it2->second.m_active2)
+                    for(unsigned int i(0); i<it->second.m_out.size();++i)
+                        if(it->first==it2->second.m_from && it->second.m_out[i]==it2->second.m_to && m_vertices[it->second.m_out[i]].m_active )
+                        {
+                            it->second.m_value = it->second.m_value - ( it2->second.m_weight*m_vertices[it->second.m_out[i]].m_value );
+                            if( it->second.m_value < 0)
+                             it->second.m_value=0;
+                            if( it->second.m_value > 100)
+                             it->second.m_value=100;
+
+                            std::cout << it->first << " : " << it->second.m_value << std::endl;
+                        }
             }
         }
     }
-
-}*/
-
-
+}
 
 
 
@@ -364,8 +344,6 @@ void Graph::init_consumption_Vertices()
                             SOUS FONCTION ADD AND DELETE VERTEX ET EDGE
 
 *********************************************************************************************/
-
-
 
 
 
@@ -493,17 +471,17 @@ void Graph::addEdges(int i)
 
 
 /// La méthode update à appeler dans la boucle de jeu pour les graphes avec interface
-void Graph::update()
+void Graph::update(int compteur_simulation)
 {
     if (!m_interface)
         return;
 
-    if(m_interface->m_simulation.get_value() && clock()%100 == 0)
+    if(m_interface->m_simulation.get_value() && compteur_simulation%100 == 0)
     {
-        //g.evolution();
         init_consumption_Vertices();
-        std::cout << CLOCKS_PER_SEC << std::endl;
+        evolution();
     }
+
 
     for (auto &elt : m_vertices)
     {
@@ -542,8 +520,6 @@ void Graph::update()
         addEdges(elt.first);
         deleteEdges(elt.first);
 
-        // MAJ des poids des aretes
-        elt.second.m_weight = m_vertices[elt.second.m_to].m_hunger * m_vertices[elt.second.m_to].m_value;
         if (elt.second.m_weight > 100)
             elt.second.m_weight = 100;
 
@@ -761,11 +737,6 @@ void Graph::load_graph(std::string nom_fichier)
     {
         std::cout << "Error lors du chargement du fichier !" << std::endl;
     }
-
-    for(std::map<int, Edge>::iterator it(m_edges.begin()); it!=m_edges.end(); ++it)
-    {
-        it->second.m_weight=m_vertices[it->second.m_to].m_value*m_vertices[it->second.m_to].m_hunger;
-    }
 }
 
 void Graph::save_graph(std::string nom_fichier)
@@ -804,7 +775,8 @@ void Graph::save_graph(std::string nom_fichier)
             fc << it->second.m_pos_x << " ";
             fc << it->second.m_pos_y << " ";
             fc << it->second.m_value << " ";
-            fc << it->second.m_hunger << " ";
+            fc << it->second.m_growth << " ";
+            fc << it->second.m_mortality << " ";
             fc << it->second.m_active << " ";
             if(!it->second.m_active)
                 fc << true << " ";
@@ -914,7 +886,7 @@ void Graph::CFC(int x,int& n, std::stack<int>& pile, std::vector<int>& pref, std
             pile.pop();
             dansPile[y]=false;
             unecompconnexe.push_back(y);
-           // std::cout<<"Y : "<<y<<std::endl;
+            // std::cout<<"Y : "<<y<<std::endl;
         }
         while(x!=y);
         m_comp.push_back(unecompconnexe);
@@ -1035,11 +1007,11 @@ void Graph::k_sommet_connexe()
 {
     std::vector<std::vector<int>> tab;
 
-    for(unsigned int k=0; k<m_adjacensePoidsSymetrique.size();k++)
+    for(unsigned int k=0; k<m_adjacensePoidsSymetrique.size(); k++)
     {
         std::cout<<"On supprime le sommet : "<<k<< " ";
         tab = m_adjacensePoidsSymetrique;       //on fait une copie du tableau d'adjacense pour pouvoir le manipuler sans le modifier
-        for(unsigned int i=0; i< m_adjacensePoidsSymetrique[k].size();i++)
+        for(unsigned int i=0; i< m_adjacensePoidsSymetrique[k].size(); i++)
             tab[i].erase(tab[i].begin()+k);
 
         tab.erase(tab.begin()+k);       //on supprime le sommet que l'on test
@@ -1072,11 +1044,11 @@ bool Graph::grapheConnexe(std::vector<std::vector<int>> tab, int s)
 
         for (int t=0; t<m_ordre-1; ++t)       //parcours tous les sommets adjacents
         {
-                if (!marques[t]&&tab[s][t])        //si le sommet adjacent n'est pas marqués
-                {
-                    file.push(t);       //on enfile t
-                    marques[t]=true;      //et on le marque
-                }
+            if (!marques[t]&&tab[s][t])        //si le sommet adjacent n'est pas marqués
+            {
+                file.push(t);       //on enfile t
+                marques[t]=true;      //et on le marque
+            }
         }
     }
 
@@ -1087,7 +1059,7 @@ bool Graph::grapheConnexe(std::vector<std::vector<int>> tab, int s)
     }
 
 
-        for (auto elem : marques)
+    for (auto elem : marques)
     {
         std::cout<<elem<<" - ";
     }

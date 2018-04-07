@@ -32,6 +32,7 @@ int main()
         {
             choix=m.update();
             grman::mettre_a_jour();
+            int compteur_simulation(0);
 
             //si le premier bouton est pressé, on rentre dans le deuxieme menu pour choisir le graphe
             if(choix==1)
@@ -56,8 +57,10 @@ int main()
                         //boucle de jeu du premier graphe
                         while(!key[KEY_N])
                         {
+                            ++compteur_simulation;
+
                             // Il faut appeler les méthodes d'update des objets qui comportent des widgets
-                            g.update();
+                            g.update(compteur_simulation);
                             g.majTabAdja();
 
                             g.save_graph("countryside");
@@ -73,6 +76,9 @@ int main()
                                 grman::fermer_allegro();
                                 return 0;
                             }
+
+                            if(compteur_simulation%100 == 0)
+                                compteur_simulation=0;
                         }
 
                     }

@@ -173,13 +173,13 @@ private :
     int m_pos_x;
     int m_pos_y;
 
-    ///faim
-    float m_hunger;
-
     /// Si on supprime le sommet ou non
     bool m_active = true;
     /// Bool pour faire fonctionner la sauvegarde des sommets supp
     bool m_saveSupp;
+
+    /// Coef d'individu mort par tour
+    float m_mortality;
 
     /// le POINTEUR sur l'interface associée, nullptr -> pas d'interface
     //std::shared_ptr<VertexInterface> m_interface = nullptr;
@@ -417,7 +417,7 @@ public:
     void make_example();
 
     /// La méthode update à appeler dans la boucle de jeu pour les graphes avec interface
-    void update();
+    void update(int compteur_simulation);
 
     /// DELETE ET ADD VERTEX
     void deleteVertex(int i);
