@@ -18,6 +18,9 @@ private:
     grman::WidgetText m_texteButton1;
     grman::WidgetText m_texteButton2;
     grman::WidgetText m_texteButton3;
+    grman::WidgetImage m_imageButton1;
+    grman::WidgetImage m_imageButton2;
+    grman::WidgetImage m_imageButton3;
 
 
 public:

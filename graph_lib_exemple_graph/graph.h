@@ -349,6 +349,10 @@ private :
     grman::WidgetCheckBox m_simulation;
     grman::WidgetText m_textSimulation;
 
+    //Bouton pour la forte connexité
+    grman::WidgetButton m_buttonFCC;
+    grman::WidgetText m_textFCC;
+
 public :
 
     // Le constructeur met en place les éléments de l'interface
@@ -383,6 +387,12 @@ private :
     int m_capacity;
 
     std::vector<int> tab;
+
+    /// ensemble des composants fortements connexes
+    std::vector<std::vector<int>> m_comp;
+
+    ///couleur de fond du sommet
+    int m_color;
 
 
 public:
@@ -419,8 +429,11 @@ public:
     /// Mise à jour des population de chaque sommet en fonction de leur influence
     void evolution();
 
-    ///affichage des maps
+    ///inititialisation du tableau d'adjacense
     void initTabAdja();
+
+    ///metre à jour la tableau d'adjacense
+    void majTabAdja();
 
     /// Lecture des fichiers du projet
     void load_graph(std::string nom_fichier);
@@ -431,7 +444,9 @@ public:
     ///algo pour trouver la forte connexité V2
     void algo_forte_connexite();
 
-    void CFC(int x,int& n, std::stack<int>& pile, std::vector<int>& pref, std::vector<int>& ret, std::vector<std::vector<int>>& comp, std::vector<bool> dansPile );
+    void CFC(int x,int& n, std::stack<int>& pile, std::vector<int>& pref, std::vector<int>& ret,  std::vector<bool> dansPile );
+
+    int colorChoice(int nb_color);
 };
 
 

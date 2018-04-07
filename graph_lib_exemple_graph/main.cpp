@@ -49,13 +49,14 @@ int main()
                         Graph g;
                         g.load_graph("countryside");
                         g.initTabAdja();
-                        g.make_example();
                         g.algo_forte_connexite();
+                        g.make_example();
                         //boucle de jeu du premier graphe
                         while(!key[KEY_N])
                         {
                             // Il faut appeler les méthodes d'update des objets qui comportent des widgets
                             g.update();
+                            g.majTabAdja();
 
                             g.save_graph("countryside");
 

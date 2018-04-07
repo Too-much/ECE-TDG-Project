@@ -5,7 +5,7 @@ MenuInterface::MenuInterface(int x, int y, int w, int h, int choix)
 {
     if (choix==1)
     {
-            //affichage du fond pour le menu
+    //affichage du fond pour le menu
     m_top_box.set_dim(1020,760);
     m_top_box.set_gravity_xy(grman::GravityX::Center, grman::GravityY::Center);
     m_top_box.add_child(m_background);
@@ -48,7 +48,8 @@ MenuInterface::MenuInterface(int x, int y, int w, int h, int choix)
 
     if (choix==2)
     {
-           //affichage du fond pour le menu
+
+    //affichage du fond pour le menu
     m_top_box.set_dim(1020,760);
     m_top_box.set_gravity_xy(grman::GravityX::Center, grman::GravityY::Center);
     m_top_box.add_child(m_background);
@@ -63,9 +64,11 @@ MenuInterface::MenuInterface(int x, int y, int w, int h, int choix)
     m_top_box.add_child(m_button1);
     m_button1.set_dim(280,80);
     m_button1.set_pos(350,300);
-    m_button1.set_bg_color(GRISSOMBRE);
+    m_button1.add_child(m_imageButton1);
+    m_imageButton1.set_pic_name("background_bouton1.jpg");
     m_button1.add_child(m_texteButton1);
-    m_texteButton1.set_pos(110,30);
+    m_texteButton1.set_pos(75,15);
+    m_texteButton1.set_bg_color(GRISSOMBRE);
     m_texteButton1.set_message(" Graphe numero 1 ");
 
 
@@ -73,18 +76,22 @@ MenuInterface::MenuInterface(int x, int y, int w, int h, int choix)
     m_top_box.add_child(m_button2);
     m_button2.set_dim(280,80);
     m_button2.set_pos(350,400);
-    m_button2.set_bg_color(GRISSOMBRE);
+    m_button2.add_child(m_imageButton2);
+    m_imageButton2.set_pic_name("background_bouton2.jpg");
     m_button2.add_child(m_texteButton2);
-    m_texteButton2.set_pos(110,30);
+    m_texteButton2.set_pos(75,15);
+    m_texteButton2.set_bg_color(GRISSOMBRE);
     m_texteButton2.set_message(" Graphe numero 2");
 
     //affichage du troisième bouton
     m_top_box.add_child(m_button3);
     m_button3.set_dim(280,80);
     m_button3.set_pos(350,500);
-    m_button3.set_bg_color(GRISSOMBRE);
+    m_button3.add_child(m_imageButton3);
+    m_imageButton3.set_pic_name("background_bouton3.jpg");
     m_button3.add_child(m_texteButton3);
-    m_texteButton3.set_pos(110,30);
+    m_texteButton3.set_pos(75,15);
+    m_texteButton3.set_bg_color(GRISSOMBRE);
     m_texteButton3.set_message(" graphe numero 3 ");
     }
 

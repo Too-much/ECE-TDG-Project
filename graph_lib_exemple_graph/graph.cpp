@@ -27,6 +27,7 @@ VertexInterface::VertexInterface(int idx, int x, int y, std::string pic_name, in
     // La boite englobante
     m_top_box.set_pos(x, y);
     m_top_box.set_dim(130, 100); // Change la taille des box des SOMMETS
+    m_top_box.set_bg_color(BLANC);
     m_top_box.set_moveable();
 
 
@@ -64,20 +65,20 @@ VertexInterface::VertexInterface(int idx, int x, int y, std::string pic_name, in
     m_box_label_idx.add_child( m_label_idx );
     m_label_idx.set_message( std::to_string(idx) );
 
-    if(growth==0)
-        m_top_box.set_bg_color(ROUGESOMBRE);
-    if(growth==1)
-        m_top_box.set_bg_color(ROUGE);
-    if(growth==2)
-        m_top_box.set_bg_color(ROUGECLAIR);
-    if(growth==3)
-        m_top_box.set_bg_color(VERTSOMBRE);
-    if(growth==4)
-        m_top_box.set_bg_color(VERT);
-    if(growth==5)
-        m_top_box.set_bg_color(VERTCLAIR);
-    if(growth>=6)
-        m_top_box.set_bg_color(BLANC);
+//    if(growth==0)
+//        m_top_box.set_bg_color(ROUGESOMBRE);
+//    if(growth==1)
+//        m_top_box.set_bg_color(ROUGE);
+//    if(growth==2)
+//        m_top_box.set_bg_color(ROUGECLAIR);
+//    if(growth==3)
+//        m_top_box.set_bg_color(VERTSOMBRE);
+//    if(growth==4)
+//        m_top_box.set_bg_color(VERT);
+//    if(growth==5)
+//        m_top_box.set_bg_color(VERTCLAIR);
+//    if(growth>=6)
+//        m_top_box.set_bg_color(BLANC);
 }
 
 /// Gestion du Vertex avant l'appel à l'interface
@@ -95,6 +96,7 @@ void Vertex::pre_update()
     m_pos_x = m_interface->m_top_box.get_posx();
     m_pos_y = m_interface->m_top_box.get_posy();
     m_value = m_interface->m_slider_value.get_value();
+
 }
 
 
@@ -274,6 +276,15 @@ GraphInterface::GraphInterface(int x, int y, int w, int h)
     m_main_box.set_gravity_xy(grman::GravityX::Right, grman::GravityY::Up);
     m_main_box.add_child(m_img);
     m_img.set_pic_name("coupe_paysage.jpg");
+
+    //bouton pour la forte connexité
+    m_tool_box.add_child(m_buttonFCC);
+    m_buttonFCC.set_dim(94,50);
+    m_buttonFCC.set_bg_color(GRISCLAIR);
+    m_buttonFCC.set_pos(3,520);
+    m_buttonFCC.add_child(m_textFCC);
+    m_textFCC.set_gravity_xy(grman::GravityX::Center, grman::GravityY::Center);
+    m_textFCC.set_message("Voir les FCC");
 }
 
 
@@ -295,20 +306,20 @@ void Graph::init_consumption_Vertices()
         //le k du mangeur
         float k_sommet(0);
 
-            for(unsigned int i(0); i<it->second.m_out.size(); ++i)
+        for(unsigned int i(0); i<it->second.m_out.size(); ++i)
+        {
+            for(std::map<int, Edge>::iterator it2(m_edges.begin()); it2!=m_edges.end(); ++it2)
             {
-                for(std::map<int, Edge>::iterator it2(m_edges.begin()); it2!=m_edges.end(); ++it2)
+                //si on retrouve le sommet it2 dans les successeurs de it + arete corespondante
+                if(it->first == it2->second.m_from)
                 {
-                    //si on retrouve le sommet it2 dans les successeurs de it + arete corespondante
-                    if(it->first == it2->second.m_from)
-                    {
-                        //k_sommet = k_sommet + ( (it->second.m_hunger/it->second.m_out.size()) * it2->second.m_value);
-                        k_sommet = k_sommet + (it2->second.m_weight*m_vertices[it2->second.m_to].m_value);
-                    }
+                    //k_sommet = k_sommet + ( (it->second.m_hunger/it->second.m_out.size()) * it2->second.m_value);
+                    k_sommet = k_sommet + (it2->second.m_weight*m_vertices[it2->second.m_to].m_value);
                 }
             }
-            it->second.m_consumption = k_sommet;
-            //std::cout<<"le k du sommet : "<<it->first<<" est "<<it->second.m_consumption<<std::endl<<std::endl;
+        }
+        it->second.m_consumption = k_sommet;
+        //std::cout<<"le k du sommet : "<<it->first<<" est "<<it->second.m_consumption<<std::endl<<std::endl;
     }
     std::cout << "OUI" << std::endl;
 }
@@ -390,7 +401,7 @@ void Graph::addVertex(int i)
     //                          - Cree l'interface du sommet sur la main BOX
     if(m_vertices[i].m_interface->m_select2.get_value() && m_interface->m_buttonAdd.clicked())
     {
-        for (unsigned int j(0); j<tab.size();++j)
+        for (unsigned int j(0); j<tab.size(); ++j)
             if(tab[j]==i)
                 tab.erase(tab.begin()+j);
 
@@ -450,9 +461,9 @@ void Graph::addEdges(int i)
     {
         if(m_vertices[m_edges[i].m_from].m_active && m_vertices[m_edges[i].m_to].m_active)
         {
-            for (unsigned int j(0); j<tab.size();++j)
-            if(tab[j]==i)
-                tab.erase(tab.begin()+j);
+            for (unsigned int j(0); j<tab.size(); ++j)
+                if(tab[j]==i)
+                    tab.erase(tab.begin()+j);
             m_edges[i].m_active2 = true;
             m_edges[i].m_active = true;
             m_edges[i].m_interface->m_select2.set_value(false);
@@ -503,6 +514,25 @@ void Graph::update()
             elt.second.m_value= m_interface->m_slider.get_value();
 
         elt.second.pre_update();
+    }
+
+    //si on veut voir la forte connexité
+    if(m_interface->m_buttonFCC.clicked())
+    {
+        algo_forte_connexite();
+        for(unsigned int i=0; i<m_comp.size(); ++i)
+        {
+            for(unsigned int j=0; j<m_comp[i].size(); j++)
+            {
+                for (auto &elt2 : m_vertices)
+                {
+                    if(elt2.first==m_comp[i][j])
+                    {
+                        elt2.second.m_interface->m_top_box.set_bg_color(colorChoice(i));        //on change les couleurs
+                    }
+                }
+            }
+        }
     }
 
 
@@ -608,11 +638,10 @@ void Graph::make_example()
 *********************************************************************************************/
 
 
-
-
+///inititialisation du tableau d'adjacense
 void Graph::initTabAdja()
 {
-    ///on initialise le tableau d'adjacense
+    //on initialise le tableau d'adjacense
     for(int w=0; w<m_ordre; w++)
     {
         m_adjacensePoids.push_back( std::vector<int> () );
@@ -637,15 +666,10 @@ void Graph::initTabAdja()
         }
     }
 
-    ///on donne les valeurs du fichier au tableau d'adjacense
-    for(std::map<int, Edge>::iterator it = m_edges.begin(); it != m_edges.end(); ++it)
-    {
-        m_adjacensePoids[it->second.m_from][it->second.m_to]=it->second.m_weight;
-       // m_adjacensePoids[it->second.m_to][it->second.m_from]=it->second.m_weight;
-       //ne doit pas etre mise car cela rend le tableau d'adjacense symétrique
-    }
+    //on donne les valeurs du fichier au tableau d'adjacense
+    majTabAdja();
 
-    ///on affiche le tableau d'adjacense
+    //on affiche le tableau d'adjacense
     std::cout<<"Tableau d'adjacense : "<<std::endl;
     for(int w=0; w<m_ordre; w++)
     {
@@ -669,6 +693,18 @@ void Graph::initTabAdja()
     }
 
 
+}
+
+///mise a jour du tableau d'adjacense
+void Graph::majTabAdja()
+{
+    //on donne les valeurs du fichier au tableau d'adjacense
+    for(std::map<int, Edge>::iterator it = m_edges.begin(); it != m_edges.end(); ++it)
+    {
+        m_adjacensePoids[it->second.m_from][it->second.m_to]=it->second.m_active;
+        // m_adjacensePoids[it->second.m_to][it->second.m_from]=it->second.m_weight;
+        //ne doit pas etre mise car cela rend le tableau d'adjacense symétrique
+    }
 }
 
 
@@ -789,8 +825,9 @@ void Graph::algo_forte_connexite()
     std::stack<int> pile;
     std::vector<int> pref;      //pour savoir si le sommet est marqué
     std::vector<int> ret;
-    std::vector<std::vector<int>> comp;     // ensemble des composants fortements connexes
     std::vector<bool> dansPile;     //pour savoir si le sommet est dans la pile
+
+    m_comp.erase(m_comp.begin(),m_comp.end());
 
     //initialisation des vecteurs
     for(int s=0; s<m_ordre; ++s)
@@ -805,32 +842,30 @@ void Graph::algo_forte_connexite()
     {
         if(pref[s]==0)
         {
-            CFC(s,n,pile,pref,ret,comp,dansPile);
+            CFC(s,n,pile,pref,ret,dansPile);
         }
     }
 
 
     //affichage des composants fortements connexes
     std::cout<<std::endl<<"Tableau des composantes fortement connexes : "<<std::endl;
-    for(unsigned int w=0; w<comp.size(); w++)
+    for(unsigned int w=0; w<m_comp.size(); w++)
     {
-        for(unsigned int z=0; z<comp[w].size(); z++)
+        for(unsigned int z=0; z<m_comp[w].size(); z++)
         {
-            std::cout<<comp[w][z] <<" ";
+            std::cout<<m_comp[w][z] <<" ";
         }
         std::cout<<std::endl;
     }
-    std::cout<<std::endl<<std::endl<<std::endl;
-    std::cout<<comp.size();
+    std::cout<<std::endl<<std::endl;
 }
 
-void Graph::CFC(int x,int& n, std::stack<int>& pile, std::vector<int>& pref, std::vector<int>& ret, std::vector<std::vector<int>>& comp, std::vector<bool> dansPile )
+void Graph::CFC(int x,int& n, std::stack<int>& pile, std::vector<int>& pref, std::vector<int>& ret, std::vector<bool> dansPile )
 {
     //initialisation des variables
     int y;
     int m;
-    std::cout<<"X : "<<x<<std::endl;
-
+    //std::cout<<"X : "<<x<<std::endl;
 
     pref[x]=n;      //on marque le sommet x;
     m=pref[x];
@@ -844,7 +879,7 @@ void Graph::CFC(int x,int& n, std::stack<int>& pile, std::vector<int>& pref, std
         {
             if(pref[y]==0)
             {
-                CFC(y,n,pile,pref,ret,comp,dansPile);     //parcours en profondeur récursif
+                CFC(y,n,pile,pref,ret,dansPile);     //parcours en profondeur récursif
 
                 if(pref[x]<ret[y])
                     m=pref[x];
@@ -864,7 +899,6 @@ void Graph::CFC(int x,int& n, std::stack<int>& pile, std::vector<int>& pref, std
     ret[x]=m;
     if(m==pref[x])     //si x est une racine, alors on calcul la composante fortement connexe associée
     {
-
         std::vector<int> unecompconnexe;
         do
         {
@@ -872,10 +906,41 @@ void Graph::CFC(int x,int& n, std::stack<int>& pile, std::vector<int>& pref, std
             pile.pop();
             dansPile[y]=false;
             unecompconnexe.push_back(y);
-            std::cout<<"Y : "<<y<<std::endl;
-        }while(x!=y);
-        comp.push_back(unecompconnexe);
+           // std::cout<<"Y : "<<y<<std::endl;
+        }
+        while(x!=y);
+        m_comp.push_back(unecompconnexe);
     }
 
 }
 
+
+int Graph::colorChoice(int nb_color)
+{
+    if(nb_color==0)
+        return BLEU;
+    else if(nb_color==1)
+        return JAUNE;
+    else if(nb_color==2)
+        return ROUGE;
+    else if(nb_color==3)
+        return VIOLET;
+    else if(nb_color==4)
+        return MARRON;
+    else if(nb_color==5)
+        return VERT;
+    else if(nb_color==6)
+        return BLEUCLAIR;
+    else if(nb_color==7)
+        return JAUNECLAIR;
+    else if(nb_color==8)
+        return ROUGECLAIR;
+    else if(nb_color==9)
+        return VIOLETCLAIR;
+    else if(nb_color==10)
+        return MARRONCLAIR;
+    else if(nb_color==11)
+        return VERTCLAIR;
+    else
+        return GRIS;
+}
