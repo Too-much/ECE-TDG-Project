@@ -1036,26 +1036,41 @@ void Graph::k_sommet_connexe()
 {
     std::vector<std::vector<int>> tab;
 
-    for(unsigned int k=0; k<m_adjacensePoidsSymetrique.size(); k++)
-    {
-        std::cout<<"On supprime le sommet : "<<k<< " ";
-        tab = m_adjacensePoidsSymetrique;       //on fait une copie du tableau d'adjacense pour pouvoir le manipuler sans le modifier
-        for(unsigned int i=0; i< m_adjacensePoidsSymetrique[k].size(); i++)
-            tab[i].erase(tab[i].begin()+k);
+    ///variables pour régler la k-sommet-connexité
+    int k = 3;
+    int n = m_ordre-k;
 
-        tab.erase(tab.begin()+k);       //on supprime le sommet que l'on test
-        grapheConnexe(tab,k);     //on appel la fonction qui détermine si ce nouveau graphe (sans k) est connexe
+
+    //calcul et affichage des k-plets sommets
+    for (int i = 0; i < n; ++i)
+    {
+        m_people.push_back(i+1);
     }
+    go(0, k);
+    std::cout<<std::endl<<std::endl;
+    for(unsigned int z=0; z<m_kplet.size(); ++z)    //pour chaque k-plet
+    {
+        tab = m_adjacensePoidsSymetrique;       //on fait une copie du tableau d'adjacense pour pouvoir le manipuler sans le modifier
+        for(unsigned int h=0; h<m_kplet[z].size(); h++)     //on supprime tous les sommets du k-plet
+        {
+            //suppresion colone + ligne numero k
+            for(unsigned int i=0; i< m_adjacensePoidsSymetrique[i].size()-h; i++)
+            {
+                tab[i].erase(tab[i].begin()+m_kplet[z][h]);
+            }
+            tab.erase(tab.begin()+m_kplet[z][h]);       //on supprime le sommet que l'on test
+        }
+        grapheConnexe(tab,z);     //on appel la fonction qui détermine si ce nouveau graphe (sans k) est connexe
+
+    }
+
 }
 
 
 ///fonction pour tester la connexité d'un graphe à partir de sa matrice d'adjacense
-bool Graph::grapheConnexe(std::vector<std::vector<int>> tab, int s)
+bool Graph::grapheConnexe(std::vector<std::vector<int>> tab, int z)
 {
-    if (s!=0)
-        s=0;
-    else
-        s=1;
+    int s=0;
     bool connexe=true; //booléen retourné à la fin de la fonction
     std::vector<int> marques;   //vecteur pour savoir si un sommet est marqués
     for(unsigned int i=0; i< tab.size(); ++i)   //initialisation du vecteur marques
@@ -1071,7 +1086,7 @@ bool Graph::grapheConnexe(std::vector<std::vector<int>> tab, int s)
         s= file.front();
         file.pop();
 
-        for (int t=0; t<m_ordre-1; ++t)       //parcours tous les sommets adjacents
+        for (unsigned int t=0; t<tab.size(); ++t)       //parcours tous les sommets adjacents
         {
             if (!marques[t]&&tab[s][t])        //si le sommet adjacent n'est pas marqués
             {
@@ -1088,13 +1103,65 @@ bool Graph::grapheConnexe(std::vector<std::vector<int>> tab, int s)
     }
 
 
-    for (auto elem : marques)
-    {
-        std::cout<<elem<<" - ";
-    }
+//    std::cout<<" -> ";
+//    for (auto elem : marques)
+//    {
+//        std::cout<<elem<<" - ";
+//    }
+
+
+
     if (!connexe)
-        std::cout<<"Le graphe n'est pas connexe"<<std::endl;
-    else
-        std::cout<<"Le graphe est connexe"<<std::endl;
+    {
+        std::cout<<"Le K-plet suivant brise la connexite du graphe : ";
+        for (auto elem : m_kplet[z])
+            std::cout<<elem<< " - ";
+        std::cout<<std::endl;
+
+    }
+//    else
+//        std::cout<<"connexe"<<std::endl;
+
     return connexe;     //retourne si le graphe est connexe (true) ou s'il ne l'est pas (false)
+}
+
+
+///code pris sur ce site : https://stackoverflow.com/questions/12991758/creating-all-possible-k-combinations-of-n-items-in-c
+///*************************************************************************************************************************
+///Il permet de calculer les K-plets de sommets
+
+
+void Graph::pretty_print(const std::vector<int>& v)
+{
+    static int count = 0;
+    std::cout << "combination no " << (++count) << ": [ ";
+    for (unsigned int i = 0; i < v.size(); ++i)
+    {
+        std::cout << v[i] << " ";
+    }
+    std::cout << "] " << std::endl;
+}
+
+void Graph::go(int offset, int k)
+{
+    //vecteur tempon
+    std::vector<int> temp;
+    if (k == 0)
+    {
+        //pour afficher les k_plets :
+        pretty_print(m_combination);
+        return;
+    }
+
+    for (unsigned int i = offset; i <= m_people.size() - k ; ++i)
+    {
+        m_combination.push_back(m_people[i]);
+        go(i+1, k-1);
+        temp=m_combination;
+        std::reverse(temp.begin(),temp.end());
+        m_kplet.push_back(temp);
+        m_combination.pop_back();
+
+    }
+
 }

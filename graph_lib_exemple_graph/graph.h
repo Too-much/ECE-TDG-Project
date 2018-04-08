@@ -412,6 +412,12 @@ private :
     ///couleur de fond du sommet
     int m_color;
 
+    ///deuv vecteurs pour les kplets sommets
+    std::vector<int> m_people;
+    std::vector<int> m_combination;
+
+    std::vector<std::vector<int>> m_kplet;
+
 
 public:
 
@@ -486,7 +492,11 @@ public:
     void k_sommet_connexe();
 
     ///fonction pour voir si un graphe est simplement-connexe
-    bool grapheConnexe(std::vector<std::vector<int>> tab, int s);
+    bool grapheConnexe(std::vector<std::vector<int>> tab,int z);
+
+    ///deux procédures pour calculer les k-plets sommets
+    void pretty_print(const std::vector<int>& v);
+    void go(int offset, int k);
 };
 
 
