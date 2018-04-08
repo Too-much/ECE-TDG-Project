@@ -292,11 +292,11 @@ GraphInterface::GraphInterface(int x, int y, int w, int h, std::string photo, in
 
     /// CHECK pour reset
     m_tool_box.add_child(m_reset);
+    m_reset.set_bg_color(GRISCLAIR);
     m_reset.set_dim(30,30);
     m_reset.set_pos(35,550);
     m_tool_box.add_child(m_name_reset);
     m_name_reset.set_pos(35,590);
-    m_name_reset.set_bg_color(GRISCLAIR);
     m_name_reset.set_message("Reset");
 
     /// K-PLET SOMMET // ARETE
