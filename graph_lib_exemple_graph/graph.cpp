@@ -19,6 +19,7 @@ Vertex::Vertex(std::ifstream& fc)
     fc >> m_active;
     fc >> m_saveSupp;
     fc >> m_event;
+    fc >> m_detrivore;
     m_interface=nullptr;
 }
 
@@ -263,11 +264,31 @@ GraphInterface::GraphInterface(int x, int y, int w, int h, std::string photo)
     if(photo=="banquise.jpg")
     {
         m_tool_box.add_child(m_event);
+        m_event.set_dim(30,30);
+        m_event.set_bg_color(GRISCLAIR);
+        m_event.set_pos(5,270);
+        m_tool_box.add_child(m_nomEvent);
+        m_nomEvent.set_message("Melt");
+        m_nomEvent.set_pos(7,320);
+
+        m_tool_box.add_child(m_event2);
+        m_event2.set_dim(30,30);
+        m_event2.set_bg_color(GRISCLAIR);
+        m_event2.set_pos(60,270);
+        m_tool_box.add_child(m_nomEvent2);
+        m_nomEvent2.set_message("Rise");
+        m_nomEvent2.set_pos(62,320);
+    }
+
+    //BOUTTON LANCEMENT EVENT
+    if(photo=="dinosaure.jpg")
+    {
+        m_tool_box.add_child(m_event);
         m_event.set_dim(40,40);
         m_event.set_bg_color(GRISCLAIR);
         m_event.set_pos(30,270);
         m_tool_box.add_child(m_nomEvent);
-        m_nomEvent.set_message("EVENT");
+        m_nomEvent.set_message("METEOR");
         m_nomEvent.set_pos(32,320);
     }
 
@@ -316,7 +337,7 @@ void Graph::init_consumption_Vertices()
             }
             it->second.m_consumption = k;
 
-            if(it->second.m_in.size() == 0 && !it->second.m_event)
+            if(it->second.m_in.size() == 0 && it->second.m_event == 0)
                 it->second.m_consumption = 1000;
         }
     }
@@ -330,18 +351,28 @@ void Graph::evolution()
     {
         if(it->second.m_active)
         {
+            // détermination de la value du somet selon l'event
             int rapport_n_k = it->second.m_value/it->second.m_consumption;
-            if(m_interface->m_event.get_value() && it->second.m_event)
+
+            if(m_interface->m_event2.get_value() && it->second.m_event==2)
+                it->second.m_growth = 0.4;
+
+            if(m_interface->m_event.get_value() && it->second.m_event==1)
                 it->second.m_value=it->second.m_value*(1+it->second.m_growth*(1-rapport_n_k))-(it->second.m_mortality+20);
             else
                 it->second.m_value=it->second.m_value*(1+it->second.m_growth*(1-rapport_n_k))-it->second.m_mortality;
+
             for(std::map<int, Edge>::iterator it2(m_edges.begin()); it2!=m_edges.end(); ++it2)
             {
                 if(it2->second.m_active || it2->second.m_active2)
                     for(unsigned int i(0); i<it->second.m_out.size();++i)
                         if(it->first==it2->second.m_from && it->second.m_out[i]==it2->second.m_to && m_vertices[it->second.m_out[i]].m_active )
                         {
-                            it->second.m_value = it->second.m_value - ( it2->second.m_weight*m_vertices[it->second.m_out[i]].m_value );
+                            // Calcule de la nouvelle population de l'indidivus selon ce que lui prend les autres
+                            if(!m_vertices[it->second.m_out[i]].m_detrivore)
+                                it->second.m_value = it->second.m_value - ( it2->second.m_weight*m_vertices[it->second.m_out[i]].m_value );
+
+                            // Check les depecement de valeur
                             if( it->second.m_value < 0)
                              it->second.m_value=0;
                             if( it->second.m_value > 100)
@@ -779,6 +810,7 @@ void Graph::save_graph(std::string nom_fichier)
             else
                 fc << it->second.m_saveSupp << " ";
             fc << it->second.m_event << " ";
+            fc << it->second.m_detrivore << " ";
         }
     }
 

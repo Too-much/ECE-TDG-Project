@@ -179,10 +179,13 @@ private :
     bool m_saveSupp;
 
     /// Si influencer par l'EVENEMENT
-    bool m_event = false;
+    int m_event;
 
     /// Coef d'individu mort par tour
     float m_mortality;
+
+    // determine si un sommet est un détrivore ou non
+    bool m_detrivore = false;
 
     /// le POINTEUR sur l'interface associée, nullptr -> pas d'interface
     //std::shared_ptr<VertexInterface> m_interface = nullptr;
@@ -360,6 +363,10 @@ private :
     // Boutton de lancement EVENT
     grman::WidgetCheckBox m_event;
     grman::WidgetText m_nomEvent;
+
+    // Boutton de lancement EVENT 2
+    grman::WidgetCheckBox m_event2;
+    grman::WidgetText m_nomEvent2;
 
 public :
 
