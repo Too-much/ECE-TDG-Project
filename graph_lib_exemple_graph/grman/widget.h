@@ -413,7 +413,7 @@ class WidgetEdge : public Widget
         // Elements de décoration : pointes de flèches, rond etc...
         std::vector<ArrowItem> m_items;
 
-        int m_color;
+        int m_color = VERT;
         int m_thickness = 2;
 
         // Position relative des éventuels Widgets enfants le long de l'arc, 0 origine, 0.5 milieu, 1.0 destination
@@ -443,6 +443,7 @@ class WidgetEdge : public Widget
         void set_children_position(double rel_pos) { m_children_position = rel_pos; }
         void set_children_lateral(double abs_lat) { m_children_lateral = abs_lat; }
         void setEdgeColor(int color){m_color=color;}
+        void set_thickness(int thick) {m_thickness = thick;}
 };
 
 

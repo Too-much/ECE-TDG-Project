@@ -19,6 +19,7 @@ int main()
     //inititialisation des menus
     Menu m(1);
     Menu m2(2);
+    Menu m3(3);
 
 
 
@@ -79,8 +80,7 @@ int main()
                     }
                     if(choix2==2)
                     {
-                         /*Graph g2("dinosaure", "dinosaure.jpg");
-
+                        Graph g2("dinosaure", "dinosaure.jpg");
                         //boucle de jeu du premier graphe
                         while(!key[KEY_N])
                         {
@@ -89,8 +89,7 @@ int main()
                             // Il faut appeler les méthodes d'update des objets qui comportent des widgets
                             g2.update(compteur_simulation);
                             g2.majTabAdja();
-
-                            g2.save_graph("ocean");
+                            g2.save_graph("dinosaure");
 
                             // Mise à jour générale (clavier/souris/buffer etc...)
                             grman::mettre_a_jour();
@@ -107,7 +106,6 @@ int main()
                             if(compteur_simulation%100 == 0)
                                 compteur_simulation=0;
                         }
-                    */
                     }
 
                     if(choix2==3)
@@ -149,7 +147,11 @@ int main()
             //si le deuxieme bouton est pressé, on affiche les règles
             if(choix==2)
             {
-
+                 while(!key[KEY_R])
+                 {
+                    m3.update();
+                    grman::mettre_a_jour();
+                 }
             }
 
             //si le troisième bouton est pressé, on quitte l'application

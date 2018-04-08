@@ -1,0 +1,2 @@
+code permettant de calculer les k_plets (combinaisons de k parmi m_ordre)
+https://stackoverflow.com/questions/12991758/creating-all-possible-k-combinations-of-n-items-in-c

@@ -51,7 +51,6 @@ VertexInterface::VertexInterface(int idx, int x, int y, std::string pic_name, in
         m_img.set_pic_idx(pic_idx);
         m_img.set_gravity_x(grman::GravityX::Right);
     }
-
     // Création d'un boutton sélectionner ou non en haut à gauche de chaque sommet
     m_img.add_child(m_select);
     m_select.set_dim(15,15);
@@ -158,27 +157,26 @@ void Edge::pre_update()
     if (!m_interface)
         return;
 
-
     if(m_weight>=0.9&&m_weight<1)
-        m_interface->m_top_edge.setEdgeColor(ROUGESOMBRE);
+        m_interface->m_top_edge.set_thickness(10);
     if(m_weight>=0.80&&m_weight<0.90)
-        m_interface->m_top_edge.setEdgeColor(ROUGE);
+        m_interface->m_top_edge.set_thickness(9);
     if(m_weight>=0.70&&m_weight<0.80)
-        m_interface->m_top_edge.setEdgeColor(ROUGECLAIR);
+        m_interface->m_top_edge.set_thickness(8);
     if(m_weight>=0.60&&m_weight<0.70)
-        m_interface->m_top_edge.setEdgeColor(ORANGESOMBRE);
+        m_interface->m_top_edge.set_thickness(7);
     if(m_weight>=0.50&&m_weight<0.60)
-        m_interface->m_top_edge.setEdgeColor(ORANGE);
+        m_interface->m_top_edge.set_thickness(6);
     if(m_weight>=0.40&&m_weight<0.50)
-        m_interface->m_top_edge.setEdgeColor(ORANGECLAIR);
+        m_interface->m_top_edge.set_thickness(5);
     if(m_weight>=0.30&&m_weight<0.40)
-        m_interface->m_top_edge.setEdgeColor(JAUNESOMBRE);
+        m_interface->m_top_edge.set_thickness(4);
     if(m_weight>=0.20&&m_weight<0.30)
-        m_interface->m_top_edge.setEdgeColor(JAUNE);
+        m_interface->m_top_edge.set_thickness(3);
     if(m_weight>=0.10&&m_weight<0.20)
-        m_interface->m_top_edge.setEdgeColor(JAUNECLAIR);
+        m_interface->m_top_edge.set_thickness(2);
     if(m_weight>=0&&m_weight<0.10)
-        m_interface->m_top_edge.setEdgeColor(VERT);
+        m_interface->m_top_edge.set_thickness(1);
 
     /// Copier la valeur locale de la donnée m_weight vers le slider associé
     m_interface->m_slider_weight.set_value( m_weight);
@@ -210,7 +208,7 @@ void Edge::post_update()
 
 /// Ici le constructeur se contente de préparer un cadre d'accueil des
 /// éléments qui seront ensuite ajoutés lors de la mise ne place du Graphe
-GraphInterface::GraphInterface(int x, int y, int w, int h, std::string photo)
+GraphInterface::GraphInterface(int x, int y, int w, int h, std::string photo, int ordre)
 {
     m_top_box.set_dim(1020,760);
     m_top_box.set_gravity_xy(grman::GravityX::Center, grman::GravityY::Center);
@@ -220,22 +218,7 @@ GraphInterface::GraphInterface(int x, int y, int w, int h, std::string photo)
     m_tool_box.set_gravity_xy(grman::GravityX::Left, grman::GravityY::Up);
     m_tool_box.set_bg_color(BLANCBLEU);
 
-    // CREATION DU SLIDER SELECT
-    m_tool_box.add_child(m_slider);   //on crée un slider dans la dans la seconde boite qui est dans la toolbox
-    m_slider.set_range(0.0, 100.0);
-    m_slider.set_dim(16,40);
-    m_slider.set_gravity_xy(grman::GravityX::Right,grman::GravityY::Down);
-    m_slider.set_bg_color(JAUNESOMBRE);
-    m_tool_box.add_child(m_selectSlider);
-    m_selectSlider.set_dim(30,30);
-    m_selectSlider.set_gravity_xy(grman::GravityX::Center,grman::GravityY::Down);
-
-    // Label de visualisation de valeur de slider select
-    m_slider.add_child( m_textSlider );
-    m_textSlider.set_gravity_y(grman::GravityY::Down);
-    m_textSlider.set_message(std::to_string(m_slider.get_value()));
-
-    // BUTTON DE SUPPRESSION DE SOMMET
+    /// BUTTON DE SUPPRESSION DE SOMMET
     m_tool_box.add_child(m_buttonDel);
     m_buttonDel.set_dim(35,30);
     m_buttonDel.set_gravity_xy(grman::GravityX::Left, grman::GravityY::Center);
@@ -243,7 +226,7 @@ GraphInterface::GraphInterface(int x, int y, int w, int h, std::string photo)
     m_buttonDel.add_child(m_buttonDel_label);
     m_buttonDel_label.set_message("DEL");
 
-    //BUTTON D'AJOUT DE SOMMET
+    ///BUTTON D'AJOUT DE SOMMET
     m_tool_box.add_child(m_buttonAdd);
     m_buttonAdd.set_dim(35,30);
     m_buttonAdd.set_gravity_xy(grman::GravityX::Right, grman::GravityY::Center);
@@ -251,7 +234,7 @@ GraphInterface::GraphInterface(int x, int y, int w, int h, std::string photo)
     m_buttonAdd.add_child(m_buttonAdd_label);
     m_buttonAdd_label.set_message("ADD");
 
-    // BOUTTON LANCEMENT SIMULATION
+    /// BOUTTON LANCEMENT SIMULATION
     m_tool_box.add_child(m_simulation);
     m_simulation.set_dim(50,50);
     m_simulation.set_bg_color(GRISCLAIR);
@@ -260,7 +243,7 @@ GraphInterface::GraphInterface(int x, int y, int w, int h, std::string photo)
     m_textSimulation.set_message("PLAY");
     m_textSimulation.set_pos(35,460);
 
-    //BOUTTON LANCEMENT EVENT
+    ///BOUTTON LANCEMENT EVENT
     if(photo=="banquise.jpg")
     {
         m_tool_box.add_child(m_event);
@@ -280,7 +263,7 @@ GraphInterface::GraphInterface(int x, int y, int w, int h, std::string photo)
         m_nomEvent2.set_pos(62,320);
     }
 
-    //BOUTTON LANCEMENT EVENT
+    ///BOUTTON LANCEMENT EVENT
     if(photo=="dinosaure.jpg")
     {
         m_tool_box.add_child(m_event);
@@ -292,21 +275,67 @@ GraphInterface::GraphInterface(int x, int y, int w, int h, std::string photo)
         m_nomEvent.set_pos(32,320);
     }
 
-    // MAIN BOX
+    /// MAIN BOX
     m_top_box.add_child(m_main_box);
     m_main_box.set_dim(908,720);
     m_main_box.set_gravity_xy(grman::GravityX::Right, grman::GravityY::Up);
     m_main_box.add_child(m_img);
     m_img.set_pic_name(photo);
 
-    //bouton pour la forte connexité
+    ///bouton pour la forte connexité
     m_tool_box.add_child(m_buttonFCC);
     m_buttonFCC.set_dim(94,50);
     m_buttonFCC.set_bg_color(GRISCLAIR);
-    m_buttonFCC.set_pos(3,520);
+    m_buttonFCC.set_pos(3,480);
     m_buttonFCC.add_child(m_textFCC);
-    m_textFCC.set_gravity_xy(grman::GravityX::Center, grman::GravityY::Center);
-    m_textFCC.set_message("Voir les FCC");
+    m_textFCC.set_message("Strongly CC");
+
+    /// CHECK pour reset
+    m_tool_box.add_child(m_reset);
+    m_reset.set_dim(30,30);
+    m_reset.set_pos(35,550);
+    m_tool_box.add_child(m_name_reset);
+    m_name_reset.set_pos(35,590);
+    m_name_reset.set_bg_color(GRISCLAIR);
+    m_name_reset.set_message("Reset");
+
+    /// K-PLET SOMMET // ARETE
+    m_tool_box.add_child(m_button_k_plet);
+    m_button_k_plet.set_pos(2,670);
+    m_button_k_plet.set_dim(45,30);
+    m_button_k_plet.set_bg_color(GRISCLAIR);
+    m_button_k_plet.add_child(m_text_k_plet);
+    m_text_k_plet.set_message("k-v");
+
+    m_tool_box.add_child(m_button_robuste);
+    m_button_robuste.set_pos(52,670);
+    m_button_robuste.set_dim(45,30);
+    m_button_robuste.set_bg_color(GRISCLAIR);
+    m_button_robuste.add_child(m_text_robuste);
+    m_text_robuste.set_message("k-e");
+
+    m_tool_box.add_child(m_slider_robuste);
+    m_slider_robuste.set_dim(10,40);
+    m_slider_robuste.set_pos(83,610);
+    m_slider_robuste.set_range(0,ordre-1);
+    m_tool_box.add_child(m_textSlider_robuste);
+    m_textSlider_robuste.set_pos(85,660);
+    m_textSlider_robuste.set_message(std::to_string( (int) m_slider_robuste.get_value()));
+
+    m_tool_box.add_child(m_k_sommet);
+    m_k_sommet.set_dim(10,10);
+    m_k_sommet.set_pos(3,630);
+    m_tool_box.add_child(m_text_k_sommet);
+    m_text_k_sommet.set_pos(18,630);
+    m_text_k_sommet.set_message("k-vertex");
+
+    m_tool_box.add_child(m_k_arete);
+    m_k_arete.set_dim(10,10);
+    m_k_arete.set_pos(3,645);
+    m_tool_box.add_child(m_text_k_arete);
+    m_text_k_arete.set_pos(18,645);
+    m_text_k_arete.set_message("k-edge");
+
 }
 
 
@@ -351,7 +380,7 @@ void Graph::evolution()
     {
         if(it->second.m_active)
         {
-            // détermination de la value du somet selon l'event
+            /// détermination de la value du somet selon l'event
             int rapport_n_k = it->second.m_value/it->second.m_consumption;
 
             if(m_interface->m_event2.get_value() && it->second.m_event==2)
@@ -359,6 +388,7 @@ void Graph::evolution()
 
             if(m_interface->m_event.get_value() && it->second.m_event==1)
                 it->second.m_value=it->second.m_value*(1+it->second.m_growth*(1-rapport_n_k))-(it->second.m_mortality+20);
+
             else
                 it->second.m_value=it->second.m_value*(1+it->second.m_growth*(1-rapport_n_k))-it->second.m_mortality;
 
@@ -377,8 +407,6 @@ void Graph::evolution()
                              it->second.m_value=0;
                             if( it->second.m_value > 100)
                              it->second.m_value=100;
-
-                            std::cout << it->first << " : " << it->second.m_value << std::endl;
                         }
             }
         }
@@ -395,12 +423,12 @@ void Graph::evolution()
 
 
 
-
+/// Delete le sommet cocher et le place dans la tool box
 void Graph::deleteVertex(int i)
 {
-    // Fonction permettant de : - DELETE un sommet
-    //                          - Detruire l'interface du sommet sur la main BOX
-    //                          - Ajoute le sommet dans la TOOLBOX afin de pouvoir le reADD plus tard
+    /// Fonction permettant de : - DELETE un sommet
+    ///                          - Detruire l'interface du sommet sur la main BOX
+    ///                          - Ajoute le sommet dans la TOOLBOX afin de pouvoir le reADD plus tard
     if( (m_vertices[i].m_interface->m_select.get_value() && m_interface->m_buttonDel.clicked()) || m_vertices[i].m_saveSupp)
     {
         tab.push_back(i);
@@ -422,6 +450,7 @@ void Graph::deleteVertex(int i)
     }
 }
 
+/// Ajoute le sommet coché dans la toolbox à sa place d'origine
 void Graph::addVertex(int i)
 {
     // Fonction permettant de : - Detruit l'interface du sommet dans la TOOLBOX
@@ -449,7 +478,7 @@ void Graph::addVertex(int i)
     }
 }
 
-// delete l'arete selectionner ou si les 1 des 2 sommets n'existe plus
+/// delete l'arete selectionner ou si les 1 des 2 sommets n'existe plus
 void Graph::deleteEdges(int i)
 {
     if( (m_edges[i].m_interface->m_select.get_value() && m_interface->m_buttonDel.clicked() && m_edges[i].m_active2) || m_edges[i].m_active3 )
@@ -473,7 +502,7 @@ void Graph::deleteEdges(int i)
         m_edges[i].m_interface->m_name.set_pos(toolX, (toolY+10)*tab.size());
     }
 
-    // On enleve les aretes des sommets DELETED
+    /// On enleve les aretes des sommets DELETED
     if( (!m_vertices[m_edges[i].m_from].m_active || !m_vertices[m_edges[i].m_to].m_active) && m_edges[i].m_active)
     {
         m_edges[i].m_active = false;
@@ -481,7 +510,7 @@ void Graph::deleteEdges(int i)
     }
 }
 
-// Ajoute une arete apres select
+/// Ajoute une arete apres select
 void Graph::addEdges(int i)
 {
     if( (m_edges[i].m_interface->m_select2.get_value() && !m_edges[i].m_active2 && m_interface->m_buttonAdd.clicked() ) || (!m_edges[i].m_active2 && !m_edges[i].m_active ) )
@@ -536,13 +565,39 @@ void Graph::update(int compteur_simulation)
         deleteVertex(elt.first);
         addVertex(elt.first);
 
-        // Permet d'init en permanence les slider de chaque sommet
-        if(elt.second.m_interface->m_select.get_value() && m_interface->m_selectSlider.get_value())
-            elt.second.m_value= m_interface->m_slider.get_value();
+        elt.second.pre_update();
+    }
+
+    for (auto &elt : m_edges)
+    {
+        addEdges(elt.first);
+        deleteEdges(elt.first);
+
+        if (elt.second.m_weight > 100)
+            elt.second.m_weight = 100;
 
         elt.second.pre_update();
     }
 
+    m_interface->m_top_box.update();
+    update_connexite();
+
+    for (auto &elt : m_vertices)
+    {
+        if (elt.second.m_active)
+        {
+            elt.second.post_update();
+        }
+    }
+
+    for (auto &elt : m_edges)
+    {
+        elt.second.post_update();
+    }
+}
+
+void Graph::update_connexite()
+{
     //si on veut voir la forte connexité
     if(m_interface->m_buttonFCC.clicked())
     {
@@ -562,33 +617,27 @@ void Graph::update(int compteur_simulation)
         }
     }
 
+    if( m_interface->m_button_robuste.clicked() && m_interface->m_k_arete.get_value())
+        k_arete_conexe();
 
-    for (auto &elt : m_edges)
+    if( m_interface->m_button_k_plet.clicked() && m_interface->m_k_sommet.get_value())
     {
-        addEdges(elt.first);
-        deleteEdges(elt.first);
-
-        if (elt.second.m_weight > 100)
-            elt.second.m_weight = 100;
-
-        elt.second.pre_update();
+        k_sommet_connexe();
     }
 
-    m_interface->m_top_box.update();
-
-    for (auto &elt : m_vertices)
+    //Reset des couleurs
+    if(m_interface->m_reset.get_value())
     {
-        if (elt.second.m_active)
-        {
-            m_interface->m_textSlider.set_message(std::to_string((int)m_interface->m_slider.get_value()));
-            elt.second.post_update();
-        }
+        if(!m_interface->m_k_sommet.get_value())
+            for(std::map<int, Vertex>::iterator it = m_vertices.begin(); it != m_vertices.end(); ++it)
+                it->second.m_interface->m_top_box.set_bg_color(BLANC);
     }
 
-    for (auto &elt : m_edges)
-    {
-        elt.second.post_update();
-    }
+    /// Quand le boutton k_arete_connexité n'est pas cocher
+    if(!m_interface->m_k_arete.get_value())
+        for(std::map<int, Edge>::iterator it = m_edges.begin(); it != m_edges.end(); ++it)
+            it->second.m_interface->m_top_edge.setEdgeColor(VERT);
+
 }
 
 
@@ -605,14 +654,12 @@ void Graph::update(int compteur_simulation)
 
 /// Aide à l'ajout de sommets interfacés
 void Graph::add_interfaced_vertex(int idx, double value, int x, int y, std::string pic_name, int pic_idx, int growthcolor, bool active)
-
 {
     // Création d'une interface de sommet
     VertexInterface *vi = new VertexInterface(idx, x, y, pic_name, pic_idx, growthcolor);
     // Ajout de la top box de l'interface de sommet
     m_interface->m_main_box.add_child(vi->m_top_box);
     m_vertices[idx].m_interface = vi;
-
 }
 
 /// Aide à l'ajout d'arcs interfacés
@@ -637,8 +684,6 @@ void Graph::add_interfaced_edge(int idx, int id_vert1, int id_vert2, double weig
 ///inititialisation du tableau d'adjacense
 void Graph::initTabAdja()
 {
-    std::cout << "YO 1" << std::endl;
-
     //on initialise le tableau d'adjacense et le tableau d'adjacense symetrique
     for(int w=0; w<m_ordre; w++)
     {
@@ -650,7 +695,6 @@ void Graph::initTabAdja()
             m_adjacensePoidsSymetrique[w].push_back(0);
         }
     }
-    std::cout << "YO 2" << std::endl;
 
     for(std::map<int, Vertex>::iterator it = m_vertices.begin(); it != m_vertices.end(); ++it)
     {
@@ -666,36 +710,8 @@ void Graph::initTabAdja()
             }
         }
     }
-    std::cout << "YO 3" << std::endl;
-
-    //on donne les valeurs du fichier au tableau d'adjacense
+    ///on donne les valeurs du fichier au tableau d'adjacense
     majTabAdja();
-
-    std::cout << "YO 4" << std::endl;
-    //on affiche le tableau d'adjacense
-    std::cout<<"Tableau d'adjacense : "<<std::endl;
-    for(int w=0; w<m_ordre; w++)
-    {
-        std::cout<<std::endl;
-        for(int z=0; z<m_ordre; z++)
-        {
-            std::cout<<m_adjacensePoids[w][z] <<" ";
-        }
-    }
-    std::cout<<std::endl<<std::endl<<std::endl;
-
-    // VERIFE
-    for(std::map<int, Edge>::iterator it = m_edges.begin(); it != m_edges.end(); ++it)
-    {
-        std::cout << "clef " << it->first << " Présentation : " << it->second.m_from << " " << it->second.m_to << " " << it->second.m_weight << std::endl;
-    }
-
-    for(std::map<int, Vertex>::iterator it(m_vertices.begin()); it!=m_vertices.end(); ++it)
-    {
-        std::cout << it->second.m_namePicture << " " << it->second.m_pos_x << " " << it->second.m_pos_y << " " << it->second.m_value << " // ";
-    }
-
-
 }
 
 ///mise a jour du tableau d'adjacense
@@ -755,9 +771,6 @@ void Graph::load_graph(std::string nom_fichier)
             fc >> recup;
             m_vertices.insert(std::pair<int,Vertex>(recup,Vertex(fc)));
         }
-
-        for(std::map<int, Vertex>::iterator it(m_vertices.begin()); it!=m_vertices.end(); ++it)
-            std::cout << it->second.m_namePicture << std::endl;
     }
 
     else
@@ -788,7 +801,7 @@ void Graph::save_graph(std::string nom_fichier)
             fc << it->second.m_weight << " ";
             fc << it->second.m_active << " ";
             fc << it->second.m_active2 << " ";
-            if(!it->second.m_active2 && it->second.m_active)
+            if(!it->second.m_active2 || !it->second.m_active)
                 fc << true << " ";
             else
                 fc << it->second.m_active3 << " ";
@@ -854,19 +867,6 @@ void Graph::algo_forte_connexite()
             CFC(s,n,pile,pref,ret,dansPile);
         }
     }
-
-
-    //affichage des composants fortements connexes
-    std::cout<<std::endl<<"Tableau des composantes fortement connexes : "<<std::endl;
-    for(unsigned int w=0; w<m_comp.size(); w++)
-    {
-        for(unsigned int z=0; z<m_comp[w].size(); z++)
-        {
-            std::cout<<m_comp[w][z] <<" ";
-        }
-        std::cout<<std::endl;
-    }
-    std::cout<<std::endl<<std::endl;
 }
 
 void Graph::CFC(int x,int& n, std::stack<int>& pile, std::vector<int>& pref, std::vector<int>& ret, std::vector<bool> dansPile )
@@ -874,7 +874,6 @@ void Graph::CFC(int x,int& n, std::stack<int>& pile, std::vector<int>& pref, std
     //initialisation des variables
     int y;
     int m;
-    //std::cout<<"X : "<<x<<std::endl;
 
     pref[x]=n;      //on marque le sommet x;
     m=pref[x];
@@ -915,7 +914,6 @@ void Graph::CFC(int x,int& n, std::stack<int>& pile, std::vector<int>& pref, std
             pile.pop();
             dansPile[y]=false;
             unecompconnexe.push_back(y);
-            // std::cout<<"Y : "<<y<<std::endl;
         }
         while(x!=y);
         m_comp.push_back(unecompconnexe);
@@ -923,7 +921,7 @@ void Graph::CFC(int x,int& n, std::stack<int>& pile, std::vector<int>& pref, std
 
 }
 
-
+// Colorie les sommets en fonction de leur forte connexité
 int Graph::colorChoice(int nb_color)
 {
     if(nb_color==0)
@@ -966,10 +964,12 @@ void Graph::k_arete_conexe()
     std::vector<Edge> arbre;   //cree un vecteur local qui permettra de stocker l'arbre fabriqué au fur a mesure par l'algo de prim
     int indiceA =0;
     std::vector <int> marques;  //tableau pour savoir si un sommet est marqué
-    int s,x,y,ymin,xmin;    // variable utile
-    int mini;
-
-
+    int s(0);
+    int x(0);
+    int y(0);
+    int ymin(0);
+    int xmin(0);    // variable utile
+    double mini(0);
 
     for(int i=0; i<m_ordre-1; i++)       //initialisation du vecteur arbre
     {
@@ -1002,7 +1002,9 @@ void Graph::k_arete_conexe()
                 {
                     if((m_adjacensePoidsSymetrique[x][y]!=0)&&(m_adjacensePoidsSymetrique[x][y]!=100)&&(marques[y]!=1)&&(m_adjacensePoidsSymetrique[x][y]<mini))
                     {
-                        mini=m_adjacensePoidsSymetrique[x][y];
+                        for(std::map<int, Edge>::iterator it = m_edges.begin(); it != m_edges.end(); ++it)
+                            if(y == it->second.m_to && x == it->second.m_from)
+                                mini=it->second.m_weight;
                         ymin=y;
                         xmin=x;
                     }
@@ -1016,16 +1018,18 @@ void Graph::k_arete_conexe()
         arbre[indiceA].m_to=ymin;
         indiceA++;
     }
-
-    ///on affiche le resultat
-    std::cout<<"Voici le resultat de l'algorithme de Prim (arbre recouvrant de plus petit poids) a partir du sommet "<<s<<std::endl<<std::endl;
-    for (auto elem: arbre)
+    for(std::map<int, Edge>::iterator it(m_edges.begin()); it!=m_edges.end(); ++it)
     {
-        std::cout<<"Arete "<<elem.m_from<<" - "<<elem.m_to<<"        de poids      "<<elem.m_weight<<std::endl;
+        bool ok(false);
+        for (auto elem: arbre)
+            if(elem.m_from == it->second.m_from && elem.m_to == it->second.m_to)
+                ok=true;
+        if(!ok)
+            it->second.m_interface->m_top_edge.setEdgeColor(JAUNE);
     }
 
-    std::cout<<std::endl<<"Le graphe est "<<arbre.size()<<"-arete-connexe."<<std::endl;
-
+    m_interface->m_slider_robuste.set_value(m_nb_arete - arbre.size());
+    m_interface->m_textSlider_robuste.set_message(std::to_string(m_nb_arete - arbre.size()));
 }
 
 ///******************************************************************************************************
@@ -1037,9 +1041,8 @@ void Graph::k_sommet_connexe()
     std::vector<std::vector<int>> tab;
 
     ///variables pour régler la k-sommet-connexité
-    int k = 3;
+    int k = 2;
     int n = m_ordre-k;
-
 
     //calcul et affichage des k-plets sommets
     for (int i = 0; i < n; ++i)
@@ -1047,14 +1050,15 @@ void Graph::k_sommet_connexe()
         m_people.push_back(i+1);
     }
     go(0, k);
+
     std::cout<<std::endl<<std::endl;
     for(unsigned int z=0; z<m_kplet.size(); ++z)    //pour chaque k-plet
     {
         tab = m_adjacensePoidsSymetrique;       //on fait une copie du tableau d'adjacense pour pouvoir le manipuler sans le modifier
-        for(unsigned int h=0; h<m_kplet[z].size(); h++)     //on supprime tous les sommets du k-plet
+        for(unsigned int h=0; h<m_kplet[z].size(); ++h)     //on supprime tous les sommets du k-plet
         {
             //suppresion colone + ligne numero k
-            for(unsigned int i=0; i< m_adjacensePoidsSymetrique[i].size()-h; i++)
+            for(unsigned int i=0; i< m_adjacensePoidsSymetrique.size()-h; ++i) /// modif j'ai enlevé le [i] de m_adjacensePoidsSymetrique -> aucun sens
             {
                 tab[i].erase(tab[i].begin()+m_kplet[z][h]);
             }
@@ -1064,6 +1068,10 @@ void Graph::k_sommet_connexe()
 
     }
 
+    m_kplet.erase(m_kplet.begin(),m_kplet.end());
+    m_people.erase(m_people.begin(),m_people.end());
+    m_interface->m_slider_robuste.set_value(k);
+    m_interface->m_textSlider_robuste.set_message(std::to_string(k));
 }
 
 
@@ -1102,26 +1110,16 @@ bool Graph::grapheConnexe(std::vector<std::vector<int>> tab, int z)
             connexe=false;      //si tous les sommets n'ont pas été marqués -> le graphe n'est pas connexe
     }
 
-
-//    std::cout<<" -> ";
-//    for (auto elem : marques)
-//    {
-//        std::cout<<elem<<" - ";
-//    }
-
-
-
     if (!connexe)
     {
         std::cout<<"Le K-plet suivant brise la connexite du graphe : ";
-        for (auto elem : m_kplet[z])
-            std::cout<<elem<< " - ";
-        std::cout<<std::endl;
-
+        for (unsigned int i(0); i<m_kplet[z].size(); ++i)
+        {
+            std::cout << m_kplet[z][i] << " ";
+            m_vertices[ m_kplet[z][i] ].m_interface->m_top_box.set_bg_color(ORANGE);
+        }
+        std::cout << std::endl;
     }
-//    else
-//        std::cout<<"connexe"<<std::endl;
-
     return connexe;     //retourne si le graphe est connexe (true) ou s'il ne l'est pas (false)
 }
 
@@ -1146,6 +1144,7 @@ void Graph::go(int offset, int k)
 {
     //vecteur tempon
     std::vector<int> temp;
+//    bool test;
     if (k == 0)
     {
         //pour afficher les k_plets :
@@ -1155,13 +1154,24 @@ void Graph::go(int offset, int k)
 
     for (unsigned int i = offset; i <= m_people.size() - k ; ++i)
     {
+//        test=true;
         m_combination.push_back(m_people[i]);
         go(i+1, k-1);
         temp=m_combination;
         std::reverse(temp.begin(),temp.end());
-        m_kplet.push_back(temp);
+//        for(unsigned int j(0); j<temp.size(); ++j)
+//        {
+//            if(!m_vertices[temp[j]].m_active)
+//            {
+//                test=false;
+//            }
+//        }
+//
+//        if(test)
+//        {
+            m_kplet.push_back(temp);
+//            test=false;
+//        }
         m_combination.pop_back();
-
     }
-
 }

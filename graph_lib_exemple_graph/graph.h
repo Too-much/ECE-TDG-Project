@@ -339,11 +339,6 @@ private :
     /// Dans cette boite seront ajoutés des boutons de contrôle etc...
     grman::WidgetBox m_tool_box;
 
-    // Boite à outil dans la toolbox
-    grman::WidgetVSlider m_slider;
-    grman::WidgetCheckBox m_selectSlider;
-    grman::WidgetText m_textSlider;
-
     // Boite de boutton de supression
     grman::WidgetButton m_buttonDel;
     grman::WidgetText m_buttonDel_label;
@@ -368,11 +363,29 @@ private :
     grman::WidgetCheckBox m_event2;
     grman::WidgetText m_nomEvent2;
 
+    // Boutton pour la k-arete connexité
+    grman::WidgetButton m_button_k_plet;
+    grman::WidgetButton m_button_robuste;
+    grman::WidgetText m_text_robuste;
+    grman::WidgetText m_text_k_plet;
+
+    grman::WidgetVSlider m_slider_robuste;
+    grman::WidgetText m_textSlider_robuste;
+
+    grman::WidgetCheckBox m_k_sommet;
+    grman::WidgetText m_text_k_sommet;
+    grman::WidgetCheckBox m_k_arete;
+    grman::WidgetText m_text_k_arete;
+
+    // Reset Color
+    grman::WidgetCheckBox m_reset;
+    grman::WidgetText m_name_reset;
+
 public :
 
     // Le constructeur met en place les éléments de l'interface
     // voir l'implémentation dans le .cpp
-    GraphInterface(int x, int y, int w, int h, std::string photo);
+    GraphInterface(int x, int y, int w, int h, std::string photo, int ordre);
 };
 
 
@@ -429,19 +442,18 @@ public:
     Graph (std::string fichier, std::string photo)
     {
         load_graph(fichier);
-
-        m_interface = std::make_shared<GraphInterface>(50, 0, 750, 600, photo);
+        m_interface = std::make_shared<GraphInterface>(50, 0, 750, 600, photo, m_ordre);
 
         // Creeer les widget des sommet et aretes
         for(std::map<int, Vertex>::iterator it(m_vertices.begin()); it!=m_vertices.end(); ++it)
             add_interfaced_vertex(it->first, it->second.m_value, it->second.m_pos_x, it->second.m_pos_y, it->second.m_namePicture,0,it->second.m_growth);
         for(std::map<int, Edge>::iterator it(m_edges.begin()); it!=m_edges.end(); ++it)
+        {
             add_interfaced_edge(it->first, it->second.m_from, it->second.m_to, it->second.m_weight);
+        }
 
         initTabAdja();
-        algo_forte_connexite();
-        k_arete_conexe();
-        k_sommet_connexe();
+
     }
 
     void add_interfaced_vertex(int idx, double value, int x, int y, std::string pic_name="", int pic_idx=0, int growthcolor=0, bool active=0);
@@ -470,6 +482,9 @@ public:
 
     ///metre à jour la tableau d'adjacense
     void majTabAdja();
+
+    /// Lance les teste pour les connexité
+    void update_connexite();
 
     /// Lecture des fichiers du projet
     void load_graph(std::string nom_fichier);

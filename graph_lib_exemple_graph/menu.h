@@ -21,6 +21,7 @@ private:
     grman::WidgetImage m_imageButton1;
     grman::WidgetImage m_imageButton2;
     grman::WidgetImage m_imageButton3;
+    grman::WidgetImage m_img_regle;
 
 
 public:
